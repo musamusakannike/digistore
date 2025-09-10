@@ -1,12 +1,12 @@
 const { s3 } = require("../config/aws")
-const { v4: uuidv4 } = require("uuid")
+const { v4 } = require("uuid")
 const path = require("path")
 
 // Upload file to S3
 const uploadToS3 = async (file, folder = "files") => {
   try {
     const fileExtension = path.extname(file.originalname)
-    const fileName = `${folder}/${uuidv4()}${fileExtension}`
+    const fileName = `${folder}/${v4()}${fileExtension}`
 
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET,
@@ -91,7 +91,7 @@ const getFileMetadata = async (key) => {
 // Upload thumbnail to S3
 const uploadThumbnail = async (thumbnailBuffer, originalFileName) => {
   try {
-    const fileName = `thumbnails/${uuidv4()}-${originalFileName}.jpg`
+    const fileName = `thumbnails/${v4()}-${originalFileName}.jpg`
 
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET,
