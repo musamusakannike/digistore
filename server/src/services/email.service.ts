@@ -128,7 +128,7 @@ export const sendVerificationEmail = async (
   token: string,
   name: string
 ): Promise<void> => {
-  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
+  const verifyUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${token}`;
   const htmlContent = `
     <p>Hi ${name},</p>
     <p>Thanks for registering. Please verify your email by clicking the link below:</p>
