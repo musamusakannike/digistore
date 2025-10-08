@@ -20,12 +20,7 @@ const app: Application = express()
 const httpServer = createServer(app)
 
 // Initialize Socket.IO
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
-  },
-})
+const io = new Server(httpServer, {cors: {credentials: true}})
 
 // Connect to database
 connectDB()
@@ -38,12 +33,7 @@ app.set("io", io)
 
 // Middleware
 app.use(helmet())
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
-  }),
-)
+app.use(cors())
 app.use(morgan("dev"))
 app.use(compression())
 app.use(express.json({ limit: "10mb" }))
