@@ -17,17 +17,16 @@ import {
   forgotPasswordValidator,
   resetPasswordValidator,
 } from "../validators/auth.validator"
-import { authLimiter } from "../middlewares/ratelimit.middleware"
 
 const router = Router()
 
-router.post("/register", authLimiter, registerValidator, validate, register)
-router.post("/login", authLimiter, loginValidator, validate, login)
+router.post("/register", registerValidator, validate, register)
+router.post("/login", loginValidator, validate, login)
 router.post("/refresh", refreshAccessToken)
 router.post("/logout", protect, logout)
 router.get("/verify-email/:token", verifyEmail)
 router.post("/resend-verification", protect, resendVerification)
-router.post("/forgot-password", authLimiter, forgotPasswordValidator, validate, forgotPassword)
-router.post("/reset-password/:token", authLimiter, resetPasswordValidator, validate, resetPassword)
+router.post("/forgot-password", forgotPasswordValidator, validate, forgotPassword)
+router.post("/reset-password/:token", resetPasswordValidator, validate, resetPassword)
 
-export default router
+export default router;
