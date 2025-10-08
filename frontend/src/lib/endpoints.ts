@@ -1,6 +1,6 @@
 import { apiFetch } from './api';
 import type { Paginated, Product, Cart, Order, Transaction, UserAuth, Review } from './types';
-import type { User, Notification, Category } from './types';
+import type { User, Notification, Category, AdminStats } from './types';
 
 // Auth
 export async function authRegister(input: { firstName: string; lastName: string; email: string; password: string; role?: 'buyer' | 'seller' }) {
@@ -242,4 +242,9 @@ export type SellerAnalytics = {
 };
 export async function getSellerAnalytics() {
   return apiFetch<SellerAnalytics>(`/analytics/seller`, { auth: true });
+}
+
+// Admin
+export async function getAdminStats() {
+  return apiFetch<AdminStats>(`/admin/stats`, { auth: true });
 }

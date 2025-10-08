@@ -132,3 +132,11 @@ export type ProductFile = {
   size: number;
   url: string;
 };
+
+// Admin
+export type AdminStats = {
+  users: { total: number; sellers: number; buyers: number };
+  products: { total: number; approved: number; pending: number };
+  orders: { total: number; completed: number; pending: number };
+  revenue: { total: number; platformFee: number };
+};

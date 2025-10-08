@@ -1,9 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { verifyPayment } from "@/lib/endpoints";
 
 export default function PaymentVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="pt-32 pb-16 px-6 md:px-12">
+          <div className="max-w-xl mx-auto bg-white rounded-2xl shadow p-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Payment Verification</h1>
+            <div>Verifying payment...</div>
+          </div>
+        </div>
+      }
+    >
+      <PaymentVerifyContent />
+    </Suspense>
+  );
+}
+
+function PaymentVerifyContent() {
   const sp = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<string | null>(null);

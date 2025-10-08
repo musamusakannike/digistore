@@ -1,10 +1,11 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getUnreadCount } from '@/lib/endpoints';
+import { getUnreadCount, getProfile } from '@/lib/endpoints';
 
 export default function Navbar() {
   const [unread, setUnread] = useState<number>(0);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -13,6 +14,12 @@ export default function Navbar() {
         setUnread(res.count || 0);
       } catch {
         // ignore if unauthenticated
+      }
+      try {
+        const u = await getProfile();
+        setIsAdmin(u.role === 'admin');
+      } catch {
+        setIsAdmin(false);
       }
     })();
   }, []);
@@ -25,6 +32,7 @@ export default function Navbar() {
         <Link href="/cart" className="hover:text-maroon-700">Cart</Link>
         <Link href="/orders" className="hover:text-maroon-700">Orders</Link>
         <Link href="/seller" className="hover:text-maroon-700">Seller</Link>
+        {isAdmin && <Link href="/admin" className="hover:text-maroon-700">Admin</Link>}
         <Link href="/notifications" className="relative hover:text-maroon-700">
           Notifications
           {unread > 0 && (
