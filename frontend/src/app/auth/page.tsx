@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import Link from "next/link";
+// import Link from "next/link";
+import { authLogin, authRegister } from "@/lib/endpoints";
+import { setTokens } from "@/lib/storage";
+import { useRouter } from "next/navigation";
 
 export default function AuthPages() {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,19 +16,31 @@ export default function AuthPages() {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (isLogin) {
-      console.log("Login:", { email: formData.email, password: formData.password });
-      alert("Login successful! (Demo)");
-    } else {
-      console.log("Register:", formData);
-      alert("Registration successful! (Demo)");
+    setLoading(true);
+    setError(null);
+    try {
+      if (isLogin) {
+        const res = await authLogin({ email: formData.email, password: formData.password });
+        setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+      } else {
+        const res = await authRegister({ firstName: formData.firstName, lastName: formData.lastName, email: formData.email, password: formData.password });
+        setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+      }
+      router.push(isLogin ? "/products" : "/auth/verify-email");
+    } catch (err) {
+      setError((err as Error).message || "Authentication failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,24 +51,6 @@ export default function AuthPages() {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-red-50 via-white to-red-50">
-      <nav className="flex justify-between items-center py-4 px-6 md:px-12 bg-white/70 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm">
-        <h1 className="text-2xl font-bold text-red-900">DigiStore</h1>
-        <div className="hidden md:flex space-x-8 text-gray-700 font-medium">
-          <Link href="#features" className="hover:text-red-900">
-            Features
-          </Link>
-          <Link href="#pricing" className="hover:text-red-900">
-            Pricing
-          </Link>
-          <Link href="#contact" className="hover:text-red-900">
-            Contact
-          </Link>
-        </div>
-        <Link href="/" className="bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition">
-          Back to Home
-        </Link>
-      </nav>
-
       <div className="pt-28 pb-12 px-6 flex items-center justify-center min-h-screen">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -101,6 +98,9 @@ export default function AuthPages() {
                     ? "Login to access your digital store"
                     : "Join thousands of Nigerian creators"}
                 </p>
+                {error && (
+                  <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3">{error}</div>
+                )}
 
                 <div className="space-y-4">
                   {!isLogin && (
@@ -187,9 +187,10 @@ export default function AuthPages() {
 
                   <button
                     onClick={handleSubmit}
-                    className="w-full bg-red-900 text-white py-3 rounded-lg font-medium hover:bg-red-800 transition"
+                    disabled={loading}
+                    className="w-full bg-red-900 text-white py-3 rounded-lg font-medium hover:bg-red-800 transition disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    {isLogin ? "Login" : "Create Account"}
+                    {loading ? "Please wait..." : (isLogin ? "Login" : "Create Account")}
                   </button>
                 </div>
 

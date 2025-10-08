@@ -28,25 +28,6 @@ export default function Hero() {
 
   return (
     <div className="w-full bg-white text-gray-900">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center py-4 px-6 md:px-12 bg-white/70 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm">
-        <h1 className="text-2xl font-bold text-maroon-700">DigiStore</h1>
-        <div className="hidden md:flex space-x-8 text-gray-700 font-medium">
-          <a href="#features" className="hover:text-maroon-700">
-            Features
-          </a>
-          <a href="#pricing" className="hover:text-maroon-700">
-            Pricing
-          </a>
-          <a href="#contact" className="hover:text-maroon-700">
-            Contact
-          </a>
-        </div>
-        <button className="bg-maroon-700 text-white px-4 py-2 rounded-lg hover:bg-maroon-800 transition">
-          Get Started
-        </button>
-      </nav>
-
       {/* Hero Section */}
       <section className="pt-28 md:pt-32 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8">
         {/* Left content */}
