@@ -7,6 +7,7 @@ import {
   FaGoogle,
   FaUber,
 } from "react-icons/fa";
+import Link from "next/link";
 
 const images = [
   "/images/digital1.jpg",
@@ -58,12 +59,12 @@ export default function Hero() {
             and more — securely and instantly on DigiStore.
           </p>
           <div className="mt-6 flex justify-center md:justify-start gap-4">
-            <button className="bg-maroon-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-maroon-800 transition">
+            <Link href={"/auth"} className="bg-maroon-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-maroon-800 transition">
               Start Selling
-            </button>
-            <button className="border border-maroon-700 text-maroon-700 px-6 py-3 rounded-lg font-medium hover:bg-maroon-50 transition">
+            </Link>
+            <Link href={"/products"} className="border border-maroon-700 text-maroon-700 px-6 py-3 rounded-lg font-medium hover:bg-maroon-50 transition">
               Explore Products
-            </button>
+            </Link>
           </div>
         </div>
 
