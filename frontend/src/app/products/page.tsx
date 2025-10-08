@@ -148,7 +148,7 @@ export default function ProductsPage() {
     return matchesCategory && matchesSearch;
   });
 
-  const formatPrice = (price) => `₦${price.toLocaleString()}`;
+  const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-rose-50 via-white to-rose-100">
