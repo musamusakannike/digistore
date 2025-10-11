@@ -12,13 +12,13 @@ class ApiService {
    * @param params - Query parameters
    * @returns Promise with response data
    */
-  static async get(endpoint: string, params?: Record<string, any>) {
+  static async get(endpoint: string, params?: Record<string, string | number | boolean | null | undefined>) {
     const url = new URL(`${API_URL}${endpoint}`);
     
     if (params) {
       Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null) {
-          url.searchParams.append(key, params[key]);
+          url.searchParams.append(key, String(params[key]));
         }
       });
     }
@@ -47,7 +47,7 @@ class ApiService {
    * @param data - Request body data
    * @returns Promise with response data
    */
-  static async post(endpoint: string, data?: any) {
+  static async post<T = unknown>(endpoint: string, data?: T) {
     const token = getCookie('token');
     
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -73,7 +73,7 @@ class ApiService {
    * @param data - Request body data
    * @returns Promise with response data
    */
-  static async put(endpoint: string, data?: any) {
+  static async put<T = unknown>(endpoint: string, data?: T) {
     const token = getCookie('token');
     
     const response = await fetch(`${API_URL}${endpoint}`, {

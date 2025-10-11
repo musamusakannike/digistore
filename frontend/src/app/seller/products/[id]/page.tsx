@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import type { Category, Product, ProductFile } from "@/lib/types";
 import {
   fetchProduct,
@@ -17,7 +17,6 @@ import Image from "next/image";
 
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
