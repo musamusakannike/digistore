@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router } from "express";
 import {
   initializePayment,
   verifyPayment,
@@ -7,21 +7,20 @@ import {
   getUserTransactions,
   requestRefund,
   getPaymentConfig,
-} from "../controllers/payment.controller"
-import { protect } from "../middlewares/auth.middleware"
-import { paymentLimiter } from "../middlewares/ratelimit.middleware"
+} from "../controllers/payment.controller";
+import { protect } from "../middlewares/auth.middleware";
 
-const router = Router()
+const router = Router();
 
 // Public routes
-router.get("/config", getPaymentConfig)
-router.post("/webhook", flutterwaveWebhook)
+router.get("/config", getPaymentConfig);
+router.post("/webhook", flutterwaveWebhook);
 
 // Protected routes
-router.post("/initialize", protect, paymentLimiter, initializePayment)
-router.get("/verify/:reference", protect, verifyPayment)
-router.get("/status/:reference", protect, getPaymentStatus)
-router.get("/transactions", protect, getUserTransactions)
-router.post("/:transactionId/refund", protect, requestRefund)
+router.post("/initialize", protect, initializePayment);
+router.get("/verify/:reference", protect, verifyPayment);
+router.get("/status/:reference", protect, getPaymentStatus);
+router.get("/transactions", protect, getUserTransactions);
+router.post("/:transactionId/refund", protect, requestRefund);
 
-export default router
+export default router;

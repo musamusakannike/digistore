@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaSearch,
@@ -14,6 +14,10 @@ import {
   FaShoppingCart,
 } from "react-icons/fa";
 import Image from "next/image";
+import { fetchProducts, createDirectOrder, initializePayment } from "@/lib/endpoints";
+import { getAccessToken } from "@/lib/storage";
+import type { Product } from "@/lib/types";
+import Link from "next/link";
 
 const categories = [
   { id: "all", name: "All Products", icon: FaFileAlt },
@@ -24,154 +28,90 @@ const categories = [
   { id: "software", name: "Software", icon: FaCode },
 ];
 
-const products = [
+// Fallback demo items in case API fails (keeps UI/UX consistent)
+const demoProducts = [
   {
-    id: 1,
+    _id: "demo-1",
     title: "Complete Web Development Course",
     description: "Learn HTML, CSS, JavaScript and React from scratch",
     price: 15000,
     category: "ebooks",
     rating: 4.8,
-    reviews: 234,
-    seller: "TechGuru NG",
-    image:
+    reviewsCount: 234,
+    seller: { _id: "s1", name: "TechGuru NG" },
+    images: [
       "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Afrobeat Music Pack Vol. 1",
-    description: "Professional Afrobeat loops and samples for producers",
-    price: 8500,
-    category: "music",
-    rating: 4.9,
-    reviews: 456,
-    seller: "BeatMaker Pro",
-    image:
-      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Nigerian Recipe Collection",
-    description: "150+ authentic Nigerian recipes with step-by-step guides",
-    price: 3500,
-    category: "ebooks",
-    rating: 4.7,
-    reviews: 189,
-    seller: "Naija Kitchen",
-    image:
-      "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=400&h=300&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Social Media Marketing Masterclass",
-    description: "Complete video course on growing your brand online",
-    price: 12000,
-    category: "videos",
-    rating: 4.6,
-    reviews: 312,
-    seller: "Digital Marketing Hub",
-    image:
-      "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=300&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Premium Logo Templates Bundle",
-    description: "50+ professional logo templates for businesses",
-    price: 6500,
-    category: "graphics",
-    rating: 4.8,
-    reviews: 278,
-    seller: "DesignPro Nigeria",
-    image:
-      "https://images.unsplash.com/photo-1626785774625-ddcddc3445e9?w=400&h=300&fit=crop",
-  },
-  {
-    id: 6,
-    title: "Invoice & Receipt Generator",
-    description: "Automated invoice creation software for businesses",
-    price: 9500,
-    category: "software",
-    rating: 4.5,
-    reviews: 145,
-    seller: "BizTools NG",
-    image:
-      "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop",
-  },
-  {
-    id: 7,
-    title: "Photography Presets Collection",
-    description: "100+ Lightroom presets for stunning photos",
-    price: 4500,
-    category: "graphics",
-    rating: 4.9,
-    reviews: 523,
-    seller: "PhotoMaster NG",
-    image:
-      "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=300&fit=crop",
-  },
-  {
-    id: 8,
-    title: "Financial Planning Guide",
-    description: "Complete guide to personal finance management in Nigeria",
-    price: 5000,
-    category: "ebooks",
-    rating: 4.7,
-    reviews: 267,
-    seller: "Money Matters NG",
-    image:
-      "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=300&fit=crop",
-  },
-  {
-    id: 9,
-    title: "Fitness Training Videos Bundle",
-    description: "30-day home workout program with nutrition guide",
-    price: 7500,
-    category: "videos",
-    rating: 4.8,
-    reviews: 398,
-    seller: "FitLife Nigeria",
-    image:
-      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop",
+    ],
   },
 ];
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [items, setItems] = useState<Product[]>(demoProducts as unknown as Product[]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const filteredProducts = products.filter((product) => {
-    const matchesCategory =
-      selectedCategory === "all" || product.category === selectedCategory;
-    const matchesSearch =
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // Fetch products with optional search
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchProducts(searchQuery ? { search: searchQuery } : {});
+        setItems(data.products || []);
+      } catch (e) {
+        setError((e as Error).message);
+        setItems(demoProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(run, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery]);
+
+  const filteredProducts = useMemo(() => {
+    return items.filter((product) => {
+      const catVal = typeof product.category === 'string'
+        ? product.category
+        : (product.category?.slug || product.category?._id);
+      const matchesCategory =
+        selectedCategory === "all" || (catVal === selectedCategory);
+      const matchesSearch =
+        product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [items, selectedCategory, searchQuery]);
 
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
+  const handleBuyNow = async (productId?: string) => {
+    try {
+      if (!productId) return;
+      const token = getAccessToken();
+      if (!token) {
+        window.location.href = "/auth";
+        return;
+      }
+      const order = await createDirectOrder({ productId, quantity: 1, paymentMethod: "flutterwave" });
+      const init = await initializePayment(order._id);
+      if (init.paymentLink) {
+        window.location.href = init.paymentLink;
+      }
+    } catch (e) {
+      alert((e as Error).message || "Failed to start payment");
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-rose-50 via-white to-rose-100">
-      {/* NAVBAR */}
-      <nav className="flex justify-between items-center py-4 px-6 md:px-12 bg-white/60 backdrop-blur-xl fixed top-0 left-0 right-0 z-50 border-b border-gray-200/50 shadow-sm">
-        <h1 className="text-2xl font-extrabold text-red-900 tracking-tight">
-          DigiStore
-        </h1>
-        <div className="hidden md:flex space-x-8 text-gray-700 font-medium">
-          {["Features", "Pricing", "Contact"].map((link) => (
-            <a
-              key={link}
-              href={`#${link.toLowerCase()}`}
-              className="hover:text-red-800 transition-colors"
-            >
-              {link}
-            </a>
-          ))}
-        </div>
-        <button className="bg-red-900 text-white px-5 py-2.5 rounded-xl hover:bg-red-800 transition-all shadow-md">
-          Get Started
-        </button>
-      </nav>
 
       {/* HERO SECTION */}
       <section className="pt-32 pb-12 px-6 md:px-12">
@@ -248,41 +188,50 @@ export default function ProductsPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
+            {loading && (
+              <div className="col-span-full text-center text-gray-500">Loading products...</div>
+            )}
+            {!loading && filteredProducts.map((product, idx) => (
               <motion.div
-                key={product.id}
+                key={product._id || idx}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 250 }}
                 className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all"
               >
                 <div className="relative h-52">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    width={400}
-                    height={300}
-                    className="w-full h-full object-cover"
-                  />
+                  <Link href={`/products/${product.slug || product._id}`}>
+                    <Image
+                      src={product.thumbnail || product.images?.[0] || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&h=300&fit=crop"}
+                      alt={product.title}
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
                   <div className="absolute top-3 right-3 bg-red-900/90 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price || 0)}
                   </div>
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                     <FaStar className="text-yellow-400" />
-                    {product.rating} • {product.reviews} reviews
+                    {(product.rating ?? 4.8)} • {(product.reviewsCount ?? 100)} reviews
                   </div>
-                  <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                    {product.title}
-                  </h3>
+                  <Link href={`/products/${product.slug || product._id}`} className="block">
+                    <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+                      {product.title}
+                    </h3>
+                  </Link>
                   <p className="text-gray-600 text-sm line-clamp-2 mb-4">
                     {product.description}
                   </p>
                   <div className="flex items-center justify-between border-t border-gray-200 pt-3">
                     <span className="text-sm text-gray-600">
-                      by {product.seller}
+                      by {typeof product.seller === 'object'
+                        ? ((`${product.seller?.firstName ?? ''} ${product.seller?.lastName ?? ''}`.trim()) || product.seller?.name || 'Seller')
+                        : 'Seller'}
                     </span>
-                    <button className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-800 transition">
+                    <button onClick={() => handleBuyNow(product._id)} className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-800 transition">
                       <FaShoppingCart className="text-xs" />
                       Buy Now
                     </button>
@@ -292,10 +241,13 @@ export default function ProductsPage() {
             ))}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {!loading && filteredProducts.length === 0 && (
             <div className="text-center py-20 text-gray-500 text-lg">
               No products found matching your search.
             </div>
+          )}
+          {error && (
+            <div className="text-center mt-6 text-sm text-red-700">{error}</div>
           )}
         </motion.div>
       </section>
