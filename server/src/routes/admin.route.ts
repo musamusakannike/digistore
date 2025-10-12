@@ -11,6 +11,10 @@ import {
   toggleFeaturedProduct,
   getAllOrders,
   getDashboardStats,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProduct,
 } from "../controllers/admin.controller"
 import { protect, authorize } from "../middlewares/auth.middleware"
 
@@ -31,6 +35,9 @@ router.put("/products/:id/approve", approveProduct)
 router.put("/products/:id/reject", rejectProduct)
 router.put("/products/:id/suspend", suspendProduct)
 router.put("/products/:id/featured", toggleFeaturedProduct)
+router.put("/products/:id", updateProduct)
+router.delete("/products/:id", deleteProduct)
+router.get("/products/:id", getProduct)
 
 // Order management
 router.get("/orders", getAllOrders)

@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express"
+import type { IUser } from "../models/user.model"
 import User from "../models/user.model"
 import Product from "../models/product.model"
 import Order from "../models/order.model"
@@ -7,6 +8,10 @@ import Review from "../models/review.model"
 import Category from "../models/category.model"
 import { asyncHandler } from "../utils/asynchandler.util"
 import { sendSuccess, sendError } from "../utils/response.util"
+import { generateSlug } from "../utils/slug.util"
+import cloudinary from "../config/cloudinary.config"
+
+type AuthRequest = Request & { user?: IUser; files?: any }
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
@@ -126,6 +131,21 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response, next:
   sendSuccess(res, 200, "User deleted successfully")
 })
 
+// @desc    Get single product (admin)
+// @route   GET /api/v1/admin/products/:id
+// @access  Private (Admin)
+export const getProduct = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const product = await Product.findById(req.params.id)
+    .populate("category", "name slug")
+    .populate("seller", "firstName lastName businessName avatar bio totalSales")
+
+  if (!product) {
+    return sendError(res, 404, "Product not found")
+  }
+
+  sendSuccess(res, 200, "Product retrieved successfully", { product })
+})
+
 // @desc    Get all products (admin)
 // @route   GET /api/v1/admin/products
 // @access  Private (Admin)
@@ -235,6 +255,119 @@ export const toggleFeaturedProduct = asyncHandler(async (req: Request, res: Resp
   await product.save()
 
   sendSuccess(res, 200, `Product ${product.isFeatured ? "featured" : "unfeatured"}`, { product })
+})
+
+// @desc    Update product (admin)
+// @route   PUT /api/v1/admin/products/:id
+// @access  Private (Admin)
+export const updateProduct = asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const product = await Product.findById(req.params.id)
+
+  if (!product) {
+    return sendError(res, 404, "Product not found")
+  }
+
+  const {
+    title,
+    description,
+    shortDescription,
+    category,
+    price,
+    discountPrice,
+    tags,
+    metaTitle,
+    metaDescription,
+    isActive,
+    seller,
+  } = req.body
+
+  // Update fields
+  if (title && title !== product.title) {
+    product.title = title
+    product.slug = await generateSlug(title, Product)
+  }
+  if (description) product.description = description
+  if (shortDescription) product.shortDescription = shortDescription
+  if (category) {
+    const categoryExists = await Category.findById(category)
+    if (!categoryExists) {
+      return sendError(res, 404, "Category not found")
+    }
+    product.category = category
+  }
+  if (price !== undefined) product.price = price
+  if (discountPrice !== undefined) product.discountPrice = discountPrice
+  if (tags) product.tags = JSON.parse(tags)
+  if (metaTitle) product.metaTitle = metaTitle
+  if (metaDescription) product.metaDescription = metaDescription
+  if (isActive !== undefined) product.isActive = isActive
+  if (seller) {
+    const sellerExists = await User.findById(seller)
+    if (!sellerExists || sellerExists.role !== "seller") {
+      return sendError(res, 404, "Seller not found")
+    }
+    product.seller = seller
+  }
+
+  // Handle thumbnail upload
+  if (req.files && req.files.thumbnail) {
+    const file = req.files.thumbnail as any
+    // Delete old thumbnail if exists
+    if (product.thumbnail) {
+      const publicId = product.thumbnail.split("/").slice(-2).join("/").split(".")[0]
+      await cloudinary.uploader.destroy(publicId)
+    }
+    const result = await cloudinary.uploader.upload(file.tempFilePath, {
+      folder: "digistore/products",
+      width: 800,
+      crop: "fill",
+    })
+    product.thumbnail = result.secure_url
+  }
+
+  await product.save()
+
+  sendSuccess(res, 200, "Product updated successfully", { product })
+})
+
+// @desc    Delete product (admin)
+// @route   DELETE /api/v1/admin/products/:id
+// @access  Private (Admin)
+export const deleteProduct = asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const product = await Product.findById(req.params.id)
+
+  if (!product) {
+    return sendError(res, 404, "Product not found")
+  }
+
+  // Delete files from cloudinary
+  if (product.files && product.files.length > 0) {
+    for (const file of product.files) {
+      await cloudinary.uploader.destroy(file.publicId, { resource_type: "raw" })
+    }
+  }
+
+  // Delete images from cloudinary
+  if (product.thumbnail) {
+    const publicId = product.thumbnail.split("/").slice(-2).join("/").split(".")[0]
+    await cloudinary.uploader.destroy(publicId)
+  }
+
+  if (product.images && product.images.length > 0) {
+    for (const image of product.images) {
+      const publicId = image.split("/").slice(-2).join("/").split(".")[0]
+      await cloudinary.uploader.destroy(publicId)
+    }
+  }
+
+  await product.deleteOne()
+
+  // Update category product count
+  if (product.status === "approved") {
+    await Category.findByIdAndUpdate(product.category, { $inc: { productCount: -1 } })
+  }
+
+  sendSuccess(res, 200, "Product deleted successfully")
 })
 
 // @desc    Get all orders (admin)

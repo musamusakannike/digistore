@@ -5,6 +5,7 @@ import helmet from "helmet"
 import morgan from "morgan"
 import compression from "compression"
 import cookieParser from "cookie-parser"
+import fileUpload from "express-fileupload"
 import { createServer } from "http"
 import { Server } from "socket.io"
 import connectDB from "./config/database.config"
@@ -39,6 +40,7 @@ app.use(compression())
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 app.use(cookieParser())
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }))
 
 // Health check route
 app.get("/health", (req, res) => {
