@@ -237,3 +237,11 @@ export const updatePushToken = asyncHandler<AuthRequest>(async (req: AuthRequest
 
   sendSuccess(res, 200, "Push token updated successfully")
 })
+
+// @desc    Get all sellers
+// @route   GET /api/v1/users/sellers
+// @access  Public
+export const getAllSellers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const sellers = await User.find({ role: "seller" }).select("firstName lastName businessName")
+  sendSuccess(res, 200, "Sellers retrieved successfully", { users: sellers })
+})
