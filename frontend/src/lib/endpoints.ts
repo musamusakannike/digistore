@@ -248,3 +248,24 @@ export async function getSellerAnalytics() {
 export async function getAdminStats() {
   return apiFetch<AdminStats>(`/admin/stats`, { auth: true });
 }
+
+export async function getAdminUsers(params: Record<string, string | number | undefined> = {}) {
+  const usp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && String(v).length) usp.set(k, String(v));
+  });
+  const qs = usp.toString();
+  return apiFetch<{ users: User[]; pagination: Paginated<User>["pagination"] }>(`/admin/users${qs ? `?${qs}` : ""}`, { auth: true });
+}
+
+export async function suspendUser(id: string) {
+  return apiFetch<{ success: true }>(`/admin/users/${id}/status`, { method: "PUT", body: JSON.stringify({ isActive: false }), auth: true });
+}
+
+export async function unSuspendUser(id: string) {
+  return apiFetch<{ success: true }>(`/admin/users/${id}/status`, { method: "PUT", body: JSON.stringify({ isActive: true }), auth: true });
+}
+
+export async function deleteUser(id: string) {
+  return apiFetch<{ success: true }>(`/admin/users/${id}`, { method: "DELETE", auth: true });
+}
