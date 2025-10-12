@@ -14,13 +14,14 @@ export type Product = {
     name?: string;
     firstName?: string;
     lastName?: string;
+    businessName?: string;
   };
   rating?: number;
   reviewsCount?: number;
   category?: string | { _id: string; name: string; slug?: string };
   tags?: string[];
   isActive?: boolean;
-  status?: "draft" | "pending_review" | "approved" | "rejected";
+  status?: "draft" | "pending" | "approved" | "rejected" | "suspended";
 };
 
 export type Paginated<T> = {

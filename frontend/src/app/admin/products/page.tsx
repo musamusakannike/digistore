@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { getAllProducts, deleteProduct } from "@/services/admin.service"
+import type { Product } from "@/lib/types"
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -15,7 +16,7 @@ const ProductsPage = () => {
         const data = await getAllProducts()
         setProducts(data.products)
       } catch (err) {
-        setError(err.message)
+        setError((err as Error).message)
       } finally {
         setLoading(false)
       }
@@ -24,13 +25,13 @@ const ProductsPage = () => {
     fetchProducts()
   }, [])
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async (productId: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await deleteProduct(productId)
         setProducts(products.filter((p) => p._id !== productId))
       } catch (err) {
-        setError(err.message)
+        setError((err as Error).message)
       }
     }
   }
@@ -80,7 +81,7 @@ const ProductsPage = () => {
                   </div>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <p className="text-gray-900 whitespace-no-wrap">{product.seller.businessName}</p>
+                  <p className="text-gray-900 whitespace-no-wrap">{product?.seller?.businessName || `${product?.seller?.firstName} ${product?.seller?.lastName}`}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <p className="text-gray-900 whitespace-no-wrap">${product.price.toFixed(2)}</p>
