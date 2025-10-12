@@ -11,7 +11,6 @@ import {
   toggleFeaturedProduct,
   getAllOrders,
   getDashboardStats,
-  createProduct,
   updateProduct,
   deleteProduct,
   getProduct,
