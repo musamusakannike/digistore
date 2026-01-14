@@ -41,9 +41,7 @@ export default function Navbar() {
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
                         <Link href="/" className="flex items-center">
-                            <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                                <div className="w-5 h-5 border-2 border-white rounded-sm transform rotate-45"></div>
-                            </div>
+                            <span className="ml-2 text-xl font-bold text-gray-900">DigiStore</span>
                         </Link>
 
                         {/* Search Bar */}
