@@ -65,7 +65,7 @@ function EmptyState() {
 export default function ProductsGrid({ products, isLoading = false }: ProductsGridProps) {
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {Array.from({ length: 6 }).map((_, index) => (
                     <ProductSkeleton key={index} />
                 ))}
@@ -78,7 +78,7 @@ export default function ProductsGrid({ products, isLoading = false }: ProductsGr
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {products.map((product) => (
                 <ProductCard key={product.id} {...product} />
             ))}

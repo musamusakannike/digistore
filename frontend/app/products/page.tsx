@@ -488,7 +488,7 @@ export default function ProductsPage() {
                 {/* Desktop Layout */}
                 <div className="flex gap-8">
                     {/* Desktop Sidebar */}
-                    <aside className="hidden md:block w-72 flex-shrink-0">
+                    <aside className="hidden md:block w-72 shrink-0">
                         <div className="sticky top-24">
                             <ProductsFilter
                                 categories={allCategories}

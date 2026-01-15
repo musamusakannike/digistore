@@ -171,7 +171,7 @@ export default function Navbar() {
                             <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
                                 <div className="w-5 h-5 border-2 border-white rounded-sm transform rotate-45"></div>
                             </div>
-                            <span className="text-lg font-bold">recotad</span>
+                            <span className="text-lg font-bold">Digistore</span>
                         </div>
                         <button
                             onClick={() => setIsMobileMenuOpen(false)}
