@@ -122,7 +122,7 @@ export default function FeaturedProducts() {
                     </p>
                 </div>
                 <Link
-                    href="#"
+                    href="/products"
                     className="text-sm font-semibold text-gray-900 hover:text-gray-700 underline decoration-gray-900 underline-offset-4"
                 >
                     View all products

@@ -2,6 +2,7 @@ import Hero from "./components/Hero";
 import ShopByCategory from "./components/Categories";
 import Collections from "./components/Collections";
 import FeaturedProducts from "./components/FeaturedProducts";
+import Footer from "./components/Footer";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Collections />
       <ShopByCategory />
       <FeaturedProducts />
+      <Footer />
     </main>
   );
 }
