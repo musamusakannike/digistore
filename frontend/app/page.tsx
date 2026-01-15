@@ -1,6 +1,7 @@
 import Hero from "./components/Hero";
 import ShopByCategory from "./components/Categories";
 import Collections from "./components/Collections";
+import FeaturedProducts from "./components/FeaturedProducts";
 
 export default function Home() {
   return (
@@ -8,10 +9,7 @@ export default function Home() {
       <Hero />
       <Collections />
       <ShopByCategory />
-      <div className="flex min-h-screen flex-col items-center p-24 text-center">
-        <h2 className="text-2xl font-semibold mb-6">Featured Products</h2>
-        <p className="text-gray-600">Scroll down for more content...</p>
-      </div>
+      <FeaturedProducts />
     </main>
   );
 }
