@@ -50,7 +50,7 @@ export default function Navbar() {
                                 <input
                                     type="text"
                                     placeholder="Search here..."
-                                    className="w-full px-4 py-2 pl-10 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 pl-10 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 />
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -187,7 +187,7 @@ export default function Navbar() {
                             <input
                                 type="text"
                                 placeholder="Search here..."
-                                className="w-full px-4 py-2 pl-10 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 pl-10 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <Camera className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
