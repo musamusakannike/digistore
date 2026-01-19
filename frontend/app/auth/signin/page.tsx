@@ -2,11 +2,11 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-export default function SignUpPage() {
+export default function SignInPage() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +30,8 @@ export default function SignUpPage() {
         <div className="min-h-screen w-full bg-black relative flex items-center justify-center overflow-hidden pt-14">
             {/* Background Effects */}
             <div className="absolute inset-0 grid-pattern opacity-20" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-gray-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-80 h-80 bg-gray-500/10 rounded-full blur-[100px] pointer-events-none" />
 
             <div ref={containerRef} className="w-full max-w-[500px] p-6 relative z-10">
                 <div className="glass-card rounded-0 p-8 md:p-10 border border-white/10">
@@ -47,35 +47,11 @@ export default function SignUpPage() {
 
                     {/* Title */}
                     <div className="auth-content mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-                        <p className="text-gray-400">Join the premium marketplace for creators</p>
+                        <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+                        <p className="text-gray-400">Enter your credentials to access your account</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Name Fields */}
-                        <div className="auth-content flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 space-y-2">
-                                <label htmlFor="firstName" className="text-sm font-medium text-gray-400 ml-1">First name</label>
-                                <input
-                                    type="text"
-                                    id="firstName"
-                                    placeholder="John"
-                                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
-                                    required
-                                />
-                            </div>
-                            <div className="flex-1 space-y-2">
-                                <label htmlFor="lastName" className="text-sm font-medium text-gray-400 ml-1">Last name</label>
-                                <input
-                                    type="text"
-                                    id="lastName"
-                                    placeholder="Doe"
-                                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
-                                    required
-                                />
-                            </div>
-                        </div>
-
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Email */}
                         <div className="auth-content space-y-2">
                             <label htmlFor="email" className="text-sm font-medium text-gray-400 ml-1">Email</label>
@@ -90,12 +66,17 @@ export default function SignUpPage() {
 
                         {/* Password */}
                         <div className="auth-content space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-gray-400 ml-1">Password</label>
+                            <div className="flex items-center justify-between ml-1">
+                                <label htmlFor="password" className="text-sm font-medium text-gray-400">Password</label>
+                                <Link href="/auth/forgot-password" className="text-xs text-white/60 hover:text-white transition-colors">
+                                    Forgot password?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     id="password"
-                                    placeholder="Create a strong password"
+                                    placeholder="Enter your password"
                                     className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all pr-12"
                                     required
                                 />
@@ -107,23 +88,25 @@ export default function SignUpPage() {
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
-                            <p className="text-xs text-gray-500 ml-1">Must be at least 8 characters long</p>
                         </div>
 
                         {/* Submit Button */}
-                        <div className="auth-content pt-2">
+                        <div className="auth-content pt-4">
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-white text-black font-bold py-4 rounded-0 hover:bg-gray-200 transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+                                className="w-full bg-white text-black font-bold py-4 rounded-0 hover:bg-gray-200 transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-2 group"
                             >
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span>Creating Account...</span>
+                                        <span>Signing In...</span>
                                     </>
                                 ) : (
-                                    <span>Sign Up</span>
+                                    <>
+                                        <span>Sign In</span>
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </>
                                 )}
                             </button>
                         </div>
@@ -131,9 +114,9 @@ export default function SignUpPage() {
                         {/* Footer */}
                         <div className="auth-content text-center pt-4">
                             <p className="text-gray-400 text-sm">
-                                Already have an account?{" "}
-                                <Link href="/auth/signin" className="text-white font-bold hover:underline">
-                                    Sign In
+                                Don't have an account?{" "}
+                                <Link href="/auth" className="text-white font-bold hover:underline">
+                                    Sign Up
                                 </Link>
                             </p>
                         </div>
@@ -142,9 +125,9 @@ export default function SignUpPage() {
 
                 {/* Simple Footer Links */}
                 <div className="mt-8 flex justify-center gap-6 text-xs text-gray-600 font-medium">
-                    <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
-                    <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
-                    <Link href="/help" className="hover:text-gray-400 transition-colors">Help Center</Link>
+                    <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
+                    <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
+                    <Link href="/help" className="hover:text-gray-400 transition-colors">Help</Link>
                 </div>
             </div>
         </div>
