@@ -5,9 +5,9 @@ import { ChevronDown, Check } from "lucide-react";
 
 export type SortOption =
     | "featured"
+    | "newest"
     | "price-low"
     | "price-high"
-    | "newest"
     | "best-sellers"
     | "highest-rated";
 
@@ -16,70 +16,69 @@ interface SortDropdownProps {
     onChange: (value: SortOption) => void;
 }
 
-const sortOptions: { value: SortOption; label: string }[] = [
-    { value: "featured", label: "Featured" },
-    { value: "price-low", label: "Price: Low to High" },
-    { value: "price-high", label: "Price: High to Low" },
-    { value: "newest", label: "Newest First" },
-    { value: "best-sellers", label: "Best Sellers" },
-    { value: "highest-rated", label: "Highest Rated" },
+const sortOptions: { label: string; value: SortOption }[] = [
+    { label: "Featured", value: "featured" },
+    { label: "Newest Arrivals", value: "newest" },
+    { label: "Price: Low to High", value: "price-low" },
+    { label: "Price: High to Low", value: "price-high" },
+    { label: "Best Sellers", value: "best-sellers" },
+    { label: "Highest Rated", value: "highest-rated" },
 ];
 
 export default function SortDropdown({ value, onChange }: SortDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const selectedOption = sortOptions.find((opt) => opt.value === value);
-
+    // Close dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
                 setIsOpen(false);
             }
-        };
-
+        }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleSelect = (optionValue: SortOption) => {
-        onChange(optionValue);
-        setIsOpen(false);
-    };
+    const selectedLabel = sortOptions.find((opt) => opt.value === value)?.label;
 
     return (
-        <div ref={dropdownRef} className="relative">
+        <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-gray-300 transition-all duration-200 min-w-[180px] justify-between shadow-sm"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white hover:bg-white/10 transition-all min-w-[180px] justify-between"
             >
-                <span className="flex items-center gap-2">
-                    <span className="text-gray-400">Sort by:</span>
-                    <span className="text-gray-900">{selectedOption?.label}</span>
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="text-white/40">Sort by:</span>
+                    <span>{selectedLabel}</span>
+                </div>
                 <ChevronDown
                     size={16}
-                    className={`text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                    className={`text-white/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
                         }`}
                 />
             </button>
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-full mt-2 w-full min-w-[200px] bg-[#111] border border-white/10 rounded-xl shadow-2xl z-20 py-1 animate-in fade-in zoom-in-95 duration-200">
                     {sortOptions.map((option) => (
                         <button
                             key={option.value}
-                            onClick={() => handleSelect(option.value)}
-                            className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${value === option.value
-                                    ? "text-[#FF6B35] bg-[#FF6B35]/5"
-                                    : "text-gray-700 hover:bg-gray-50"
+                            onClick={() => {
+                                onChange(option.value);
+                                setIsOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition-colors ${value === option.value
+                                ? "bg-white text-black font-medium"
+                                : "text-white/70 hover:bg-white/5 hover:text-white"
                                 }`}
                         >
-                            <span>{option.label}</span>
-                            {value === option.value && (
-                                <Check size={16} className="text-[#FF6B35]" />
-                            )}
+                            {option.label}
+                            {value === option.value && <Check size={14} />}
                         </button>
                     ))}
                 </div>

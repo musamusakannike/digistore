@@ -19,7 +19,6 @@ export default function PriceRangeSlider({
 }: PriceRangeSliderProps) {
     const [localMin, setLocalMin] = useState(minValue);
     const [localMax, setLocalMax] = useState(maxValue);
-    const [isDragging, setIsDragging] = useState<"min" | "max" | null>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -91,12 +90,12 @@ export default function PriceRangeSlider({
             {/* Visual Track */}
             <div
                 ref={trackRef}
-                className="relative h-2 bg-gray-200 rounded-full cursor-pointer mb-6"
+                className="relative h-1.5 bg-white/20 rounded-full cursor-pointer mb-6"
                 onClick={handleTrackClick}
             >
                 {/* Active Range */}
                 <div
-                    className="absolute h-full bg-gradient-to-r from-[#FF6B35] to-[#FF8F6B] rounded-full"
+                    className="absolute h-full bg-white rounded-full"
                     style={{
                         left: `${getPercentage(localMin)}%`,
                         width: `${getPercentage(localMax) - getPercentage(localMin)}%`,
@@ -105,13 +104,13 @@ export default function PriceRangeSlider({
 
                 {/* Min Thumb */}
                 <div
-                    className="absolute w-5 h-5 bg-white border-2 border-[#FF6B35] rounded-full shadow-md transform -translate-x-1/2 -translate-y-1.5 cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
+                    className="absolute w-4 h-4 bg-black border-2 border-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1.5 cursor-grab active:cursor-grabbing transition-transform hover:scale-125 hover:bg-white hover:border-black"
                     style={{ left: `${getPercentage(localMin)}%` }}
                 />
 
                 {/* Max Thumb */}
                 <div
-                    className="absolute w-5 h-5 bg-white border-2 border-[#FF6B35] rounded-full shadow-md transform -translate-x-1/2 -translate-y-1.5 cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
+                    className="absolute w-4 h-4 bg-black border-2 border-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1.5 cursor-grab active:cursor-grabbing transition-transform hover:scale-125 hover:bg-white hover:border-black"
                     style={{ left: `${getPercentage(localMax)}%` }}
                 />
             </div>
@@ -141,9 +140,9 @@ export default function PriceRangeSlider({
             {/* Manual Input Fields */}
             <div className="flex items-center gap-3">
                 <div className="flex-1">
-                    <label className="block text-xs text-gray-500 mb-1">Min</label>
+                    <label className="block text-xs text-white/40 mb-1 uppercase tracking-wider font-bold">Min Price</label>
                     <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">$</span>
                         <input
                             type="number"
                             value={localMin}
@@ -152,15 +151,15 @@ export default function PriceRangeSlider({
                             onKeyDown={(e) => e.key === "Enter" && handleMinBlur()}
                             min={minPrice}
                             max={localMax - 1}
-                            className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition-all"
+                            className="w-full bg-white/5 border border-white/10 pl-7 pr-3 py-2 text-sm text-white rounded-lg focus:outline-none focus:border-white/40 transition-all font-medium"
                         />
                     </div>
                 </div>
-                <div className="text-gray-400 pt-5">—</div>
+                <div className="text-white/20 pt-6">—</div>
                 <div className="flex-1">
-                    <label className="block text-xs text-gray-500 mb-1">Max</label>
+                    <label className="block text-xs text-white/40 mb-1 uppercase tracking-wider font-bold">Max Price</label>
                     <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">$</span>
                         <input
                             type="number"
                             value={localMax}
@@ -169,7 +168,7 @@ export default function PriceRangeSlider({
                             onKeyDown={(e) => e.key === "Enter" && handleMaxBlur()}
                             min={localMin + 1}
                             max={maxPrice}
-                            className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition-all"
+                            className="w-full bg-white/5 border border-white/10 pl-7 pr-3 py-2 text-sm text-white rounded-lg focus:outline-none focus:border-white/40 transition-all font-medium"
                         />
                     </div>
                 </div>

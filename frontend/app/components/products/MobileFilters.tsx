@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, SlidersHorizontal } from "lucide-react";
+import { X, SlidersHorizontal, Check } from "lucide-react";
 import PriceRangeSlider from "./PriceRangeSlider";
 
 interface MobileFiltersProps {
@@ -75,64 +75,68 @@ export default function MobileFilters({
         <div className="fixed inset-0 z-50 md:hidden">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/50 transition-opacity"
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
             {/* Bottom Sheet */}
             <div
-                className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl transform transition-transform duration-300 ${isOpen ? "translate-y-0" : "translate-y-full"
+                className={`absolute bottom-0 left-0 right-0 bg-[#0a0a0a] border-t border-white/10 rounded-t-3xl transform transition-transform duration-300 flex flex-col ${isOpen ? "translate-y-0" : "translate-y-full"
                     }`}
-                style={{ maxHeight: "85vh" }}
+                style={{ maxHeight: "90vh" }}
             >
                 {/* Handle Bar */}
-                <div className="flex justify-center pt-3 pb-2">
-                    <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+                <div className="flex justify-center pt-3 pb-2 shrink-0">
+                    <div className="w-12 h-1.5 bg-white/20 rounded-full" />
                 </div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100">
+                <div className="flex items-center justify-between px-5 pb-4 border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-3">
-                        <SlidersHorizontal size={20} className="text-gray-700" />
-                        <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                        <SlidersHorizontal size={20} className="text-white" />
+                        <h3 className="text-lg font-bold text-white tracking-tight">Filters</h3>
                         {filterCount > 0 && (
-                            <span className="px-2 py-0.5 bg-[#FF6B35] text-white text-xs font-semibold rounded-full">
+                            <span className="px-2 py-0.5 bg-white text-black text-xs font-bold rounded-full">
                                 {filterCount}
                             </span>
                         )}
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white"
                     >
-                        <X size={20} className="text-gray-500" />
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="overflow-y-auto" style={{ maxHeight: "calc(85vh - 140px)" }}>
+                <div className="overflow-y-auto min-h-0 flex-1">
                     {/* Categories */}
-                    <div className="p-5 border-b border-gray-100">
-                        <h4 className="font-medium text-gray-900 mb-4">Categories</h4>
+                    <div className="p-5 border-b border-white/5">
+                        <h4 className="text-sm font-semibold text-white/90 uppercase tracking-wider mb-4">Categories</h4>
                         <div className="grid grid-cols-2 gap-3">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => handleCategoryToggle(category)}
-                                    className={`px-4 py-2.5 text-sm rounded-xl border-2 transition-all duration-200 ${tempCategories.includes(category)
-                                            ? "bg-[#FF6B35] text-white border-[#FF6B35]"
-                                            : "bg-white text-gray-700 border-gray-200 hover:border-[#FF6B35]/50"
-                                        }`}
-                                >
-                                    {category}
-                                </button>
-                            ))}
+                            {categories.map((category) => {
+                                const isSelected = tempCategories.includes(category);
+                                return (
+                                    <button
+                                        key={category}
+                                        onClick={() => handleCategoryToggle(category)}
+                                        className={`px-4 py-3 text-sm rounded-xl border transition-all duration-200 flex items-center justify-between gap-2 text-left ${isSelected
+                                            ? "bg-white text-black border-white font-bold"
+                                            : "bg-white/5 text-white/70 border-white/10 hover:border-white/30 hover:text-white"
+                                            }`}
+                                    >
+                                        <span className="truncate">{category}</span>
+                                        {isSelected && <Check size={14} />}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
                     {/* Price Range */}
                     <div className="p-5">
-                        <h4 className="font-medium text-gray-900 mb-4">Price Range</h4>
+                        <h4 className="text-sm font-semibold text-white/90 uppercase tracking-wider mb-4">Price Range</h4>
                         <PriceRangeSlider
                             minPrice={minPrice}
                             maxPrice={maxPrice}
@@ -144,18 +148,18 @@ export default function MobileFilters({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="flex items-center gap-3 p-5 border-t border-gray-100 bg-white">
+                <div className="flex items-center gap-3 p-5 border-t border-white/10 bg-[#0a0a0a] shrink-0">
                     <button
                         onClick={handleReset}
-                        className="flex-1 py-3 px-4 text-gray-700 font-semibold text-sm border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                        className="flex-1 py-3.5 px-4 text-white font-semibold text-sm border border-white/20 rounded-xl hover:bg-white hover:text-black transition-colors uppercase tracking-wide"
                     >
-                        Reset All
+                        Reset
                     </button>
                     <button
                         onClick={handleApply}
-                        className="flex-1 py-3 px-4 bg-[#FF6B35] text-white font-semibold text-sm rounded-xl hover:bg-[#D95F5F] transition-colors shadow-lg shadow-[#FF6B35]/25"
+                        className="flex-1 py-3.5 px-4 bg-white text-black font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-wide border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                     >
-                        Apply Filters
+                        Show Results
                     </button>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { SlidersHorizontal, LayoutGrid, ChevronRight, Home } from "lucide-react";
+import { SlidersHorizontal, ChevronRight, Home } from "lucide-react";
 import ProductsFilter from "../components/products/ProductsFilter";
 import MobileFilters from "../components/products/MobileFilters";
 import SortDropdown, { SortOption } from "../components/products/SortDropdown";
@@ -25,7 +25,7 @@ const allCategories = [
     "Fitness Programs",
 ];
 
-// Extended dummy product data (24+ products)
+// Extended dummy product data (same as before)
 const allProducts = [
     {
         id: 1,
@@ -40,6 +40,7 @@ const allProducts = [
         discountPercent: 85,
         author: "Sarah Johnson",
     },
+    // ... (rest of the products data is preserved or can be re-imported if I wasn't overwriting, but since I am, I need to include it or import it. I'll include a subset for brevity or the full set if possible. To be safe, I'll include the full set from the previous view to avoid data loss)
     {
         id: 2,
         image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=600&fit=crop",
@@ -436,48 +437,48 @@ export default function ProductsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50/50">
+        <main className="min-h-screen bg-black pt-20">
             {/* Breadcrumb */}
-            <div className="bg-white border-b border-gray-100">
+            <div className="border-b border-white/10 bg-black">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-4">
                     <nav className="flex items-center gap-2 text-sm">
                         <Link
                             href="/"
-                            className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+                            className="flex items-center gap-1 text-white/50 hover:text-white transition-colors"
                         >
                             <Home size={16} />
                             <span>Home</span>
                         </Link>
-                        <ChevronRight size={14} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">Products</span>
+                        <ChevronRight size={14} className="text-white/30" />
+                        <span className="text-white font-medium">Products</span>
                     </nav>
                 </div>
             </div>
 
             {/* Page Header */}
-            <div className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-8">
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <div className="border-b border-white/10 bg-[#0a0a0a]">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-10">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight">
                         All Products
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-white/50 text-lg font-light">
                         Discover our complete collection of premium digital products
                     </p>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-8">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-12">
                 {/* Mobile Filter Bar */}
-                <div className="flex items-center justify-between gap-4 mb-6 md:hidden">
+                <div className="flex items-center justify-between gap-4 mb-8 md:hidden">
                     <button
                         onClick={() => setIsMobileFilterOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white shadow-sm hover:bg-white/10 transition-colors"
                     >
                         <SlidersHorizontal size={18} />
                         Filters
                         {filterCount > 0 && (
-                            <span className="px-2 py-0.5 bg-[#FF6B35] text-white text-xs font-semibold rounded-full">
+                            <span className="px-2 py-0.5 bg-white text-black text-xs font-bold rounded-full">
                                 {filterCount}
                             </span>
                         )}
@@ -486,10 +487,10 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Desktop Layout */}
-                <div className="flex gap-8">
+                <div className="flex gap-10">
                     {/* Desktop Sidebar */}
                     <aside className="hidden md:block w-72 shrink-0">
-                        <div className="sticky top-24">
+                        <div className="sticky top-28">
                             <ProductsFilter
                                 categories={allCategories}
                                 selectedCategories={selectedCategories}
@@ -506,10 +507,10 @@ export default function ProductsPage() {
                     {/* Products Area */}
                     <div className="flex-1 min-w-0">
                         {/* Desktop Sort Bar */}
-                        <div className="hidden md:flex items-center justify-between mb-6">
-                            <p className="text-sm text-gray-600">
+                        <div className="hidden md:flex items-center justify-between mb-8">
+                            <p className="text-sm text-white/50">
                                 Showing{" "}
-                                <span className="font-semibold text-gray-900">
+                                <span className="font-semibold text-white">
                                     {filteredProducts.length}
                                 </span>{" "}
                                 products
@@ -521,7 +522,7 @@ export default function ProductsPage() {
 
                         {/* Active Filters Tags */}
                         {filterCount > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mb-6">
+                            <div className="flex flex-wrap items-center gap-2 mb-8">
                                 {selectedCategories.map((category) => (
                                     <button
                                         key={category}
@@ -530,24 +531,24 @@ export default function ProductsPage() {
                                                 selectedCategories.filter((c) => c !== category)
                                             )
                                         }
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6B35]/10 text-[#FF6B35] text-sm font-medium rounded-full hover:bg-[#FF6B35]/20 transition-colors"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-white text-sm font-medium rounded-full hover:bg-white/20 transition-colors border border-white/5"
                                     >
                                         {category}
-                                        <span className="text-[#FF6B35]">×</span>
+                                        <span className="text-white/50">×</span>
                                     </button>
                                 ))}
                                 {(priceRange[0] > MIN_PRICE || priceRange[1] < MAX_PRICE) && (
                                     <button
                                         onClick={() => setPriceRange([MIN_PRICE, MAX_PRICE])}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6B35]/10 text-[#FF6B35] text-sm font-medium rounded-full hover:bg-[#FF6B35]/20 transition-colors"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-white text-sm font-medium rounded-full hover:bg-white/20 transition-colors border border-white/5"
                                     >
                                         ${priceRange[0]} - ${priceRange[1]}
-                                        <span className="text-[#FF6B35]">×</span>
+                                        <span className="text-white/50">×</span>
                                     </button>
                                 )}
                                 <button
                                     onClick={handleClearAll}
-                                    className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2"
+                                    className="text-sm text-white/50 hover:text-white underline underline-offset-2 transition-colors ml-2"
                                 >
                                     Clear all
                                 </button>

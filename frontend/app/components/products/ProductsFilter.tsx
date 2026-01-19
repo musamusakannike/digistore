@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { X } from "lucide-react";
 import PriceRangeSlider from "./PriceRangeSlider";
 
 interface ProductsFilterProps {
@@ -25,9 +24,6 @@ export default function ProductsFilter({
     onPriceChange,
     onClearAll,
 }: ProductsFilterProps) {
-    const [isCategoryOpen, setIsCategoryOpen] = useState(true);
-    const [isPriceOpen, setIsPriceOpen] = useState(true);
-
     const handleCategoryToggle = (category: string) => {
         if (selectedCategories.includes(category)) {
             onCategoryChange(selectedCategories.filter((c) => c !== category));
@@ -36,115 +32,90 @@ export default function ProductsFilter({
         }
     };
 
-    const hasActiveFilters = selectedCategories.length > 0 || priceRange[0] > minPrice || priceRange[1] < maxPrice;
+    const hasFilters =
+        selectedCategories.length > 0 ||
+        priceRange[0] > minPrice ||
+        priceRange[1] < maxPrice;
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {/* Filter Header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
-                {hasActiveFilters && (
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Filters</h3>
+                {hasFilters && (
                     <button
                         onClick={onClearAll}
-                        className="flex items-center gap-1 text-sm text-[#FF6B35] font-medium hover:text-[#D95F5F] transition-colors"
+                        className="text-xs font-medium text-white/50 hover:text-white transition-colors flex items-center gap-1"
                     >
-                        <X size={14} />
-                        Clear all
+                        <X size={12} />
+                        Clear All
                     </button>
                 )}
             </div>
 
-            {/* Categories Section */}
-            <div className="border-b border-gray-100">
-                <button
-                    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                    className="flex items-center justify-between w-full p-5 text-left hover:bg-gray-50 transition-colors"
-                >
-                    <span className="font-medium text-gray-900">Categories</span>
-                    {isCategoryOpen ? (
-                        <ChevronUp size={18} className="text-gray-500" />
-                    ) : (
-                        <ChevronDown size={18} className="text-gray-500" />
-                    )}
-                </button>
-
-                <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isCategoryOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                        }`}
-                >
-                    <div className="px-5 pb-5 space-y-3 max-h-64 overflow-y-auto">
-                        {categories.map((category) => (
+            {/* Categories */}
+            <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+                    Categories
+                </h4>
+                <div className="space-y-2.5">
+                    {categories.map((category) => {
+                        const isSelected = selectedCategories.includes(category);
+                        return (
                             <label
                                 key={category}
                                 className="flex items-center gap-3 cursor-pointer group"
                             >
-                                <div className="relative">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedCategories.includes(category)}
-                                        onChange={() => handleCategoryToggle(category)}
-                                        className="sr-only"
-                                    />
-                                    <div
-                                        className={`w-5 h-5 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${selectedCategories.includes(category)
-                                                ? "bg-[#FF6B35] border-[#FF6B35]"
-                                                : "border-gray-300 group-hover:border-[#FF6B35]/50"
-                                            }`}
-                                    >
-                                        {selectedCategories.includes(category) && (
-                                            <svg
-                                                className="w-3 h-3 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                strokeWidth={3}
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M5 13l4 4L19 7"
-                                                />
-                                            </svg>
-                                        )}
-                                    </div>
+                                <div
+                                    className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${isSelected
+                                        ? "bg-white border-white"
+                                        : "bg-transparent border-white/20 group-hover:border-white/50"
+                                        }`}
+                                >
+                                    {isSelected && (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="w-3.5 h-3.5 text-black"
+                                        >
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                    )}
                                 </div>
-                                <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={isSelected}
+                                    onChange={() => handleCategoryToggle(category)}
+                                />
+                                <span
+                                    className={`text-sm transition-colors ${isSelected ? "text-white font-medium" : "text-white/60 group-hover:text-white/80"
+                                        }`}
+                                >
                                     {category}
                                 </span>
                             </label>
-                        ))}
-                    </div>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* Price Range Section */}
-            <div>
-                <button
-                    onClick={() => setIsPriceOpen(!isPriceOpen)}
-                    className="flex items-center justify-between w-full p-5 text-left hover:bg-gray-50 transition-colors"
-                >
-                    <span className="font-medium text-gray-900">Price Range</span>
-                    {isPriceOpen ? (
-                        <ChevronUp size={18} className="text-gray-500" />
-                    ) : (
-                        <ChevronDown size={18} className="text-gray-500" />
-                    )}
-                </button>
-
-                <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isPriceOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
-                        }`}
-                >
-                    <div className="px-5 pb-5">
-                        <PriceRangeSlider
-                            minPrice={minPrice}
-                            maxPrice={maxPrice}
-                            minValue={priceRange[0]}
-                            maxValue={priceRange[1]}
-                            onChange={onPriceChange}
-                        />
-                    </div>
-                </div>
+            {/* Price Range */}
+            <div className="space-y-4 pt-4 border-t border-white/10">
+                <h4 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+                    Price Range
+                </h4>
+                <PriceRangeSlider
+                    min={minPrice}
+                    max={maxPrice}
+                    value={priceRange}
+                    onChange={onPriceChange}
+                />
             </div>
         </div>
     );
