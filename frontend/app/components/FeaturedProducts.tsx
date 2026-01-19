@@ -1,146 +1,211 @@
-import ProductCard from "./ProductCard";
-import Link from "next/link";
+"use client";
 
-// Dummy product data
+import { useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import Link from "next/link";
+import {
+    Star, Heart, ShoppingCart, ArrowRight, Eye, Plus
+} from "lucide-react";
+
+// Register plugins
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
 const featuredProducts = [
     {
         id: 1,
         image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop",
-        title: "The Complete Digital Marketing Masterclass - 23 Courses in 1",
-        category: "Online Courses",
-        description: "Master digital marketing with this comprehensive course bundle. Learn SEO, social media marketing, email marketing, content marketing, and more. Perfect for beginners and professionals looking to upgrade their skills.",
+        title: "Digital Marketing Masterclass",
+        category: "Courses",
         rating: 4.8,
-        reviewCount: 12453,
         price: 29.99,
-        originalPrice: 199.99,
-        discountPercent: 85,
-        author: "Sarah Johnson",
+        badge: "Bestseller",
     },
     {
         id: 2,
         image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=600&fit=crop",
-        title: "Professional Photo Editing Software Suite",
+        title: "Pro Photo Editing Suite",
         category: "Software",
-        description: "Industry-leading photo editing software with AI-powered tools, advanced filters, and professional-grade features. Lifetime license included with free updates.",
         rating: 4.9,
-        reviewCount: 8932,
         price: 79.99,
-        originalPrice: 149.99,
-        discountPercent: 47,
-        author: "TechVision Studios",
+        badge: "New",
     },
     {
         id: 3,
         image: "https://images.unsplash.com/photo-1481627276234-cf5f7c2d8f15?w=800&h=600&fit=crop",
-        title: "Premium Stock Photo Bundle - 10,000+ High-Res Images",
-        category: "Stock Photos",
-        description: "Massive collection of royalty-free stock photos covering business, nature, technology, lifestyle, and more. Perfect for designers, marketers, and content creators.",
+        title: "Premium Stock Bundle",
+        category: "Photos",
         rating: 4.7,
-        reviewCount: 5621,
         price: 49.99,
-        originalPrice: 299.99,
-        discountPercent: 83,
+        badge: "Popular",
     },
     {
         id: 4,
         image: "https://images.unsplash.com/photo-1509305717900-84f40e786d82?w=800&h=600&fit=crop",
-        title: "Modern Font Collection - 150+ Premium Typefaces",
+        title: "Modern Font Collection",
         category: "Fonts",
-        description: "Curated collection of modern, elegant fonts for all your design projects. Includes sans-serif, serif, script, and display fonts with full commercial license.",
         rating: 4.6,
-        reviewCount: 3245,
         price: 39.99,
-        originalPrice: 89.99,
-        discountPercent: 56,
-        author: "TypeMaster Co.",
+        badge: "Exclusive",
     },
     {
         id: 5,
         image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&h=600&fit=crop",
-        title: "Royalty-Free Music Pack - 500+ Tracks",
-        category: "Music",
-        description: "High-quality background music for videos, podcasts, presentations, and more. Multiple genres including corporate, cinematic, upbeat, and ambient.",
+        title: "Royalty-Free Music Pack",
+        category: "Audio",
         rating: 4.8,
-        reviewCount: 7834,
         price: 59.99,
-        originalPrice: 199.99,
-        discountPercent: 70,
-        author: "AudioWave Productions",
+        badge: "Trending",
     },
     {
         id: 6,
         image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=600&fit=crop",
-        title: "3D Character Models Pack - Game Ready Assets",
-        category: "3D Models",
-        description: "Professional 3D character models optimized for games and animations. Includes rigged models with multiple texture variations and animations.",
+        title: "3D Character Models",
+        category: "3D Assets",
         rating: 4.9,
-        reviewCount: 4567,
         price: 89.99,
-        originalPrice: 249.99,
-        discountPercent: 64,
-        author: "3D Art Studio",
-    },
-    {
-        id: 7,
-        image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&h=600&fit=crop",
-        title: "Web Development Bootcamp - Zero to Hero",
-        category: "Online Courses",
-        description: "Complete web development course covering HTML, CSS, JavaScript, React, Node.js, and MongoDB. Build real-world projects and get job-ready skills.",
-        rating: 4.9,
-        reviewCount: 15678,
-        price: 34.99,
-        originalPrice: 149.99,
-        discountPercent: 77,
-        author: "CodeMaster Academy",
-    },
-    {
-        id: 8,
-        image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=600&fit=crop",
-        title: "Business Website Templates - 50+ Designs",
-        category: "Templates",
-        description: "Modern, responsive website templates for businesses, portfolios, and landing pages. Easy to customize with clean code and documentation.",
-        rating: 4.7,
-        reviewCount: 6234,
-        price: 44.99,
-        originalPrice: 99.99,
-        discountPercent: 55,
-        author: "WebDesign Pro",
+        badge: "Featured",
     },
 ];
 
-export default function FeaturedProducts() {
+const ProductCard = ({ product, index }: { product: typeof featuredProducts[0]; index: number }) => {
+    const [isLiked, setIsLiked] = useState(false);
+
     return (
-        <section className="w-full max-w-7xl mx-auto px-4 md:px-16 lg:px-20 py-12">
-            {/* Section Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-                        Featured Products
-                    </h2>
-                    <p className="text-gray-600">
-                        Discover our handpicked selection of top-rated digital products
-                    </p>
+        <div className="product-card-item group relative bg-[#0a0a0a] border border-white/5 hover:border-white/20 transition-all duration-500">
+            {/* Image Container */}
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-900">
+                <Image
+                    src={product.image}
+                    alt={product.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0"
+                />
+
+                {/* Badge */}
+                <div className="absolute top-4 left-4 z-10">
+                    <span className="px-3 py-1 bg-white text-black text-xs font-bold uppercase tracking-wider">
+                        {product.badge}
+                    </span>
                 </div>
-                <Link
-                    href="/products"
-                    className="text-sm font-semibold text-gray-900 hover:text-gray-700 underline decoration-gray-900 underline-offset-4"
-                >
-                    View all products
-                </Link>
+
+                {/* Quick Actions Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                    <button
+                        onClick={() => setIsLiked(!isLiked)}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-colors ${isLiked ? 'bg-white text-black' : 'bg-black/50 text-white hover:bg-white hover:text-black'}`}
+                    >
+                        <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+                    </button>
+                    <button className="w-10 h-10 rounded-full bg-black/50 text-white hover:bg-white hover:text-black flex items-center justify-center backdrop-blur-md transition-colors">
+                        <ShoppingCart className="w-4 h-4" />
+                    </button>
+                    <Link
+                        href={`/product/${product.id}`}
+                        className="w-10 h-10 rounded-full bg-black/50 text-white hover:bg-white hover:text-black flex items-center justify-center backdrop-blur-md transition-colors"
+                    >
+                        <Eye className="w-4 h-4" />
+                    </Link>
+                </div>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredProducts.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                ))}
-            </div>
+            {/* Content */}
+            <div className="p-5">
+                <div className="flex justify-between items-start mb-2">
+                    <div>
+                        <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1">
+                            {product.category}
+                        </p>
+                        <h3 className="text-white font-medium text-lg group-hover:text-white/80 transition-colors">
+                            {product.title}
+                        </h3>
+                    </div>
+                </div>
 
-            {/* Load More Button */}
-            <div className="flex justify-center mt-12">
-                <button className="px-8 py-3 bg-gray-900 text-white rounded-lg font-semibold text-sm hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                    Load More Products
-                </button>
+                <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-4">
+                    <span className="text-xl font-bold text-white">${product.price}</span>
+                    <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-white fill-white" />
+                        <span className="text-white/60 text-sm font-medium">{product.rating}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function FeaturedProducts() {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useGSAP(() => {
+        // Header animation
+        gsap.fromTo(".products-header",
+            { opacity: 0, y: 50 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: ".products-header",
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                }
+            }
+        );
+
+        // Products grid animation
+        gsap.fromTo(".product-card-item",
+            { opacity: 0, y: 50 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: ".products-grid",
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                }
+            }
+        );
+
+    }, { scope: containerRef });
+
+    return (
+        <section className="relative py-24 md:py-32 bg-black overflow-hidden">
+            <div ref={containerRef} className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Section Header */}
+                <div className="products-header flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+                    <div>
+                        <h2 className="section-title text-white mb-2">
+                            Featured <span className="text-gray-500">Digitals</span>
+                        </h2>
+                        <p className="section-subtitle text-white/40 font-light">
+                            Selection of our highest rated products this week
+                        </p>
+                    </div>
+                    <Link
+                        href="/products"
+                        className="group flex items-center gap-2 text-white border border-white/20 px-6 py-3 hover:bg-white hover:text-black transition-all duration-300"
+                    >
+                        <span className="font-bold text-sm tracking-wide uppercase">View All Products</span>
+                        <Plus className="w-4 h-4" />
+                    </Link>
+                </div>
+
+                {/* Products Grid */}
+                <div className="products-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {featuredProducts.map((product, index) => (
+                        <ProductCard key={product.id} product={product} index={index} />
+                    ))}
+                </div>
+
+                {/* Bottom decorative line */}
+                <div className="w-full h-px bg-white/10 mt-24" />
             </div>
         </section>
     );

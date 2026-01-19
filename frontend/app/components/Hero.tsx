@@ -1,140 +1,239 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ArrowRight, Play, Star } from "lucide-react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface Slide {
-    id: number;
-    badge: string;
-    title: React.ReactNode;
-    description?: string;
-    buttonText: string;
-    image: string;
-    bgColor: string;
-}
+// Register GSAP
+gsap.registerPlugin(useGSAP);
 
-const slides: Slide[] = [
-    {
-        id: 1,
-        badge: "Exclusive collection for everyone",
-        title: (
-            <>
-                Up to <span className="font-bold">60% off</span> on
-                <br />
-                all digital items till
-                <br />
-                <span className="font-bold">September 11</span>
-            </>
-        ),
-        buttonText: "Shop now",
-        image: "/images/hero/carousel1.jpg",
-        bgColor: "bg-[#F4A4A4]",
-    },
-    {
-        id: 2,
-        badge: "New Arrival",
-        title: (
-            <>
-                Discover the <span className="font-bold">Future</span> of
-                <br />
-                Digital <span className="font-bold">Creativity</span>
-                <br />
-                today
-            </>
-        ),
-        buttonText: "Explore Now",
-        image: "/images/hero/carousel1.jpg",
-        bgColor: "bg-[#F4A4A4]",
-    },
+const stats = [
+    { value: "50K+", label: "Digital Products" },
+    { value: "100K+", label: "Happy Customers" },
+    { value: "4.9", label: "Average Rating" },
+];
+
+const floatingProducts = [
+    { src: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&h=200&fit=crop", alt: "E-book", delay: 0 },
+    { src: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=200&h=200&fit=crop", alt: "Software", delay: 0.2 },
+    { src: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=200&h=200&fit=crop", alt: "Music", delay: 0.4 },
 ];
 
 export default function Hero() {
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const heroContentRef = useRef<HTMLDivElement>(null);
+    const floatingRef = useRef<HTMLDivElement>(null);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-    const nextSlide = () => {
-        setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    };
+    useGSAP(() => {
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    const prevSlide = () => {
-        setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-    };
+        // Initial animations
+        tl.fromTo(".hero-badge",
+            { opacity: 0, y: 30, scale: 0.8 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8 }
+        )
+            .fromTo(".hero-title .word",
+                { opacity: 0, y: 80, rotateX: -90 },
+                { opacity: 1, y: 0, rotateX: 0, duration: 1, stagger: 0.1 },
+                "-=0.4"
+            )
+            .fromTo(".hero-subtitle",
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.8 },
+                "-=0.6"
+            )
+            .fromTo(".hero-buttons",
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.8 },
+                "-=0.4"
+            )
+            .fromTo(".hero-stat",
+                { opacity: 0, y: 40, scale: 0.9 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.15 },
+                "-=0.4"
+            )
+            .fromTo(".floating-product",
+                { opacity: 0, scale: 0, rotate: -20 },
+                { opacity: 1, scale: 1, rotate: 0, duration: 1, stagger: 0.2, ease: "elastic.out(1, 0.5)" },
+                "-=0.8"
+            );
 
-    const goToSlide = (index: number) => {
-        setCurrentSlide(index);
-    };
+        // Floating animation for products
+        gsap.to(".floating-product", {
+            y: "random(-20, 20)",
+            x: "random(-10, 10)",
+            rotation: "random(-5, 5)",
+            duration: "random(3, 5)",
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            stagger: {
+                each: 0.5,
+                from: "random"
+            }
+        });
 
-    // Auto-play
+        // Animate background shapes
+        gsap.to(".bg-shape", {
+            scale: "random(1, 1.2)",
+            opacity: "random(0.1, 0.2)",
+            duration: "random(5, 10)",
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            stagger: 2
+        });
+
+    }, { scope: containerRef });
+
+    // Mouse parallax effect
     useEffect(() => {
-        const timer = setInterval(() => {
-            nextSlide();
-        }, 5000);
-        return () => clearInterval(timer);
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!containerRef.current) return;
+            const rect = containerRef.current.getBoundingClientRect();
+            const x = (e.clientX - rect.left - rect.width / 2) / 50;
+            const y = (e.clientY - rect.top - rect.height / 2) / 50;
+            setMousePosition({ x, y });
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
 
     return (
-        <div className={`relative w-full overflow-hidden transition-colors duration-500 flex justify-center items-center`}>
-            <div className={`mx-auto max-w-7xl min-w-[80vw] px-4 sm:px-6 lg:px-8 h-150 md:h-125 flex items-center relative rounded-2xl md:mt-10 overflow-hidden ${slides[currentSlide].bgColor}`}>
+        <section
+            ref={containerRef}
+            className="relative min-h-screen overflow-hidden bg-black"
+        >
+            {/* Animated Background Elements - Monochrome */}
+            <div className="absolute inset-0 grid-pattern opacity-20" />
 
-                {/* Background Image */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src={slides[currentSlide].image}
-                        alt="Hero background"
-                        fill
-                        className="object-cover transition-transform duration-700"
-                        priority
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/40 z-10" />
-                </div>
+            {/* Floating Orbs - Subtle White/Gray */}
+            <div
+                className="bg-shape absolute top-20 left-10 w-96 h-96 rounded-full bg-white blur-[150px] opacity-10"
+                style={{ transform: `translate(${mousePosition.x * 2}px, ${mousePosition.y * 2}px)` }}
+            />
+            <div
+                className="bg-shape absolute bottom-20 right-10 w-80 h-80 rounded-full bg-gray-500 blur-[120px] opacity-10"
+                style={{ transform: `translate(${-mousePosition.x * 1.5}px, ${-mousePosition.y * 1.5}px)` }}
+            />
 
-                {/* Navigation Arrows */}
-                <button
-                    onClick={prevSlide}
-                    className="absolute left-4 z-20 p-2 rounded-full bg-white/30 hover:bg-white/50 text-gray-800 transition-all hidden md:block"
-                    aria-label="Previous slide"
-                >
-                    <ChevronLeft size={24} />
-                </button>
+            {/* Main Content */}
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 md:pt-32 md:pb-40">
+                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                    {/* Left Content */}
+                    <div ref={heroContentRef} className="text-center lg:text-left">
+                        {/* Badge */}
+                        <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
+                            <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                            <span className="text-sm text-white/90 font-medium tracking-wide">
+                                NEW PRODUCTS ADDED DAILY
+                            </span>
+                        </div>
 
-                <button
-                    onClick={nextSlide}
-                    className="absolute right-4 z-20 p-2 rounded-full bg-white/30 hover:bg-white/50 text-gray-800 transition-all hidden md:block"
-                    aria-label="Next slide"
-                >
-                    <ChevronRight size={24} />
-                </button>
+                        {/* Title */}
+                        <h1 className="hero-title section-title text-white mb-6">
+                            <span className="word inline-block">Discover</span>{" "}
+                            <span className="word inline-block">Premium</span>
+                            <br className="hidden sm:block" />
+                            <span className="word inline-block gradient-text">Digital</span>{" "}
+                            <span className="word inline-block gradient-text">Assets</span>
+                        </h1>
 
-                {/* Slide Content */}
-                <div className="relative z-20 w-full h-full flex flex-col justify-center items-center md:items-start pl-0 md:pl-12 text-center md:text-left">
+                        {/* Subtitle */}
+                        <p className="hero-subtitle text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 font-light">
+                            The definitive marketplace for creators and professionals.
+                            Curated high-quality software, courses, and design assets.
+                        </p>
 
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-white/90 text-[#D95F5F] font-semibold text-sm shadow-sm mb-6">
-                        {slides[currentSlide].badge}
-                    </span>
+                        {/* Buttons */}
+                        <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+                            <button className="btn-primary flex items-center justify-center gap-2 group">
+                                <span>Explore Collection</span>
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                            <button className="btn-secondary flex items-center justify-center gap-2 group">
+                                <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                                <span>Watch Showreel</span>
+                            </button>
+                        </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl text-white font-medium leading-[1.1] tracking-tight drop-shadow-sm mb-4">
-                        {slides[currentSlide].title}
-                    </h1>
+                        {/* Stats */}
+                        <div className="flex flex-wrap justify-center lg:justify-start gap-12 border-t border-white/10 pt-8">
+                            {stats.map((stat, index) => (
+                                <div key={index} className="hero-stat text-center lg:text-left">
+                                    <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                                    <div className="text-gray-500 text-sm font-medium uppercase tracking-wider">{stat.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                    <button className="bg-white text-black px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors shadow-lg mt-4 cursor-pointer">
-                        {slides[currentSlide].buttonText}
-                    </button>
+                    {/* Right Content - Floating Products */}
+                    <div
+                        ref={floatingRef}
+                        className="relative h-96 lg:h-[500px] hidden lg:block"
+                        style={{
+                            transform: `translate(${mousePosition.x * -2}px, ${mousePosition.y * -2}px)`,
+                            transition: "transform 0.3s ease-out"
+                        }}
+                    >
+                        {/* Central Product Card - Monochrome Glass */}
+                        <div className="floating-product absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-80 glass-card rounded-3xl p-4 animate-pulse-glow z-20 bg-black/40 border border-white/20">
+                            <div className="relative w-full h-48 rounded-2xl overflow-hidden mb-4 grayscale hover:grayscale-0 transition-all duration-500">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop"
+                                    alt="Featured Product"
+                                    fill
+                                    className="object-cover"
+                                />
+                                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-white text-black text-xs font-bold uppercase tracking-wider">
+                                    Bestseller
+                                </div>
+                            </div>
+                            <h3 className="text-white font-semibold mb-2 text-lg">Modern UI Kit</h3>
+                            <div className="flex items-center justify-between">
+                                <span className="text-white font-bold text-xl">$49.00</span>
+                                <div className="flex items-center gap-1 text-white/80">
+                                    <Star className="w-4 h-4 fill-white text-white" />
+                                    <span className="text-sm">4.9</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    {/* Indicators */}
-                    <div className="flex space-x-2 mt-8 md:mt-12">
-                        {slides.map((_, index) => (
-                            <button
+                        {/* Floating Mini Cards - Monochrome */}
+                        {floatingProducts.map((product, index) => (
+                            <div
                                 key={index}
-                                onClick={() => goToSlide(index)}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index ? "w-8 bg-[#FF6B6B]" : "w-8 bg-white/50 hover:bg-white/80"
-                                    }`}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
+                                className="floating-product absolute w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shadow-2xl grayscale hover:grayscale-0 transition-all duration-500"
+                                style={{
+                                    top: `${15 + index * 35}%`,
+                                    left: index % 2 === 0 ? "5%" : "85%",
+                                    opacity: 0.8
+                                }}
+                            >
+                                <Image
+                                    src={product.src}
+                                    alt={product.alt}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
                         ))}
+
+                        {/* Decorative Rings - White/Grey */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-white/5 animate-ring" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white/10"
+                            style={{ animationDirection: "reverse", animationDuration: "40s" }} />
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* Bottom Gradient Fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+        </section>
     );
 }

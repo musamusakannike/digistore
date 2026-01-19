@@ -1,75 +1,103 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import Link from "next/link";
 import {
     ShoppingCart,
     User,
     Search,
     Menu,
     X,
-    Home,
     Grid,
-    Package,
+    Heart,
     ChevronDown,
-    Camera
-} from 'lucide-react';
+} from "lucide-react";
+
+// Register plugins
+gsap.registerPlugin(useGSAP);
 
 const categories = [
-    'Software & Apps',
-    'eBooks & Guides',
-    'Graphics & Design',
-    'Templates & Themes',
-    'Audio & Music',
-    'Video & Animation',
-    'Photography',
-    'Courses & Tutorials',
-    'Fonts & Typography',
-    'UI/UX Kits',
+    { name: "Software & Apps", icon: "💻" },
+    { name: "eBooks & Guides", icon: "📚" },
+    { name: "Graphics & Design", icon: "🎨" },
+    { name: "Templates & Themes", icon: "📄" },
+    { name: "Audio & Music", icon: "🎵" },
+    { name: "Video & Animation", icon: "🎬" },
+    { name: "Photography", icon: "📷" },
+    { name: "Courses & Tutorials", icon: "🎓" },
 ];
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
-    const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [searchFocused, setSearchFocused] = useState(false);
+    const navRef = useRef<HTMLElement>(null);
+
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useGSAP(() => {
+        // Initial navbar animation
+        gsap.fromTo(navRef.current,
+            { y: -100, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+        );
+    }, { scope: navRef });
 
     return (
         <>
             {/* Desktop Navbar */}
-            <nav className="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50">
+            <nav
+                ref={navRef}
+                className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
+                        ? "bg-black/80 backdrop-blur-md border-white/10 py-3"
+                        : "bg-transparent border-transparent py-5"
+                    }`}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center">
-                            <span className="ml-2 text-xl font-bold text-gray-900">DigiStore</span>
+                        <Link href="/" className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-white flex items-center justify-center">
+                                <span className="text-black font-bold text-lg">D</span>
+                            </div>
+                            <span className="text-xl font-bold text-white tracking-tight">DigiStore</span>
                         </Link>
 
                         {/* Search Bar */}
-                        <div className="flex-1 max-w-2xl mx-8">
-                            <div className="relative">
+                        <div className={`flex-1 max-w-lg mx-12 transition-all duration-300 ${searchFocused ? "scale-105" : ""}`}>
+                            <div className="relative group">
                                 <input
                                     type="text"
-                                    placeholder="Search here..."
-                                    className="w-full px-4 py-2 pl-10 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    placeholder="Search products..."
+                                    onFocus={() => setSearchFocused(true)}
+                                    onBlur={() => setSearchFocused(false)}
+                                    className="w-full px-4 py-2.5 pl-10 bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 focus:border-white/30 transition-all font-light text-sm"
                                 />
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                    <Camera className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-                                </button>
+                                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
                             </div>
                         </div>
 
                         {/* Navigation Items */}
-                        <div className="flex items-center space-x-6">
+                        <div className="flex items-center gap-6">
                             {/* Categories Dropdown */}
                             <div className="relative">
                                 <button
                                     onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                                    className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 transition-colors"
+                                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${isCategoriesOpen ? "text-white" : "text-white/70 hover:text-white"
+                                        }`}
                                 >
-                                    <Grid className="w-4 h-4" />
-                                    <span className="text-sm font-medium">Categories</span>
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                                    <span>Categories</span>
+                                    <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isCategoriesOpen ? "rotate-180" : ""}`} />
                                 </button>
 
                                 {/* Dropdown Menu */}
@@ -78,230 +106,126 @@ export default function Navbar() {
                                         <div
                                             className="fixed inset-0 z-10"
                                             onClick={() => setIsCategoriesOpen(false)}
-                                        ></div>
-                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                                            {categories.map((category, index) => (
-                                                <Link
-                                                    key={index}
-                                                    href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                                    onClick={() => setIsCategoriesOpen(false)}
-                                                >
-                                                    {category}
-                                                </Link>
-                                            ))}
+                                        />
+                                        <div className="absolute top-full right-0 mt-4 w-64 bg-[#0a0a0a] border border-white/10 shadow-2xl z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="py-2">
+                                                {categories.map((category, index) => (
+                                                    <Link
+                                                        key={index}
+                                                        href={`/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                                                        onClick={() => setIsCategoriesOpen(false)}
+                                                    >
+                                                        <span className="opacity-50">{category.icon}</span>
+                                                        <span>{category.name}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
                                         </div>
                                     </>
                                 )}
                             </div>
 
-                            {/* Log In/Sign Up */}
-                            <Link
-                                href="/auth"
-                                className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 transition-colors"
-                            >
-                                <User className="w-4 h-4" />
-                                <span className="text-sm font-medium">Log In/Sign Up</span>
-                            </Link>
+                            {/* Icons */}
+                            <div className="flex items-center gap-4 border-l border-white/10 pl-6 h-6">
+                                <Link
+                                    href="/wishlist"
+                                    className="relative text-white/70 hover:text-white transition-colors group"
+                                >
+                                    <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                </Link>
 
-                            {/* Cart */}
-                            <Link
-                                href="/cart"
-                                className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 transition-colors"
-                            >
-                                <ShoppingCart className="w-5 h-5" />
-                                <span className="text-sm font-medium">Cart</span>
-                            </Link>
+                                <Link
+                                    href="/cart"
+                                    className="relative text-white/70 hover:text-white transition-colors group"
+                                >
+                                    <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                    <span className="absolute -top-2 -right-2 w-4 h-4 bg-white text-black text-[10px] font-bold flex items-center justify-center rounded-full">
+                                        2
+                                    </span>
+                                </Link>
+
+                                <Link
+                                    href="/auth"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                >
+                                    <User className="w-5 h-5" />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
             </nav>
 
             {/* Mobile Navbar */}
-            <nav className="md:hidden bg-white border-b border-gray-200 sticky top-0 z-50">
+            <nav className={`md:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled ? "bg-black/90 border-white/10" : "bg-transparent border-transparent"
+                } py-4`}>
                 <div className="px-4">
-                    <div className="flex items-center justify-between h-16">
-                        {/* Hamburger Menu */}
+                    <div className="flex items-center justify-between">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 text-gray-700 hover:text-gray-900"
+                            className="text-white"
                         >
                             <Menu className="w-6 h-6" />
                         </button>
 
-                        {/* Logo */}
-                        <Link href="/" className="flex items-center">
-                            <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                                <div className="w-5 h-5 border-2 border-white rounded-sm transform rotate-45"></div>
-                            </div>
+                        <Link href="/" className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-white tracking-tight">DigiStore</span>
                         </Link>
 
-                        {/* Right Icons */}
-                        <div className="flex items-center space-x-4">
-                            <Link href="/auth">
-                                <User className="w-5 h-5 text-gray-700" />
-                            </Link>
-                            <Link href="/cart">
-                                <ShoppingCart className="w-5 h-5 text-gray-700" />
-                            </Link>
-                        </div>
+                        <Link href="/cart" className="relative text-white">
+                            <ShoppingCart className="w-5 h-5" />
+                            <span className="absolute -top-2 -right-2 w-3.5 h-3.5 bg-white text-black text-[9px] font-bold flex items-center justify-center rounded-full">
+                                2
+                            </span>
+                        </Link>
                     </div>
                 </div>
             </nav>
 
-            {/* Mobile Sidebar */}
+            {/* Mobile Menu Overlay */}
             <div
-                className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                className={`fixed inset-0 z-50 md:hidden bg-black transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
-                {/* Backdrop */}
-                <div
-                    className="absolute inset-0 bg-black bg-opacity-50"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                ></div>
-
-                {/* Sidebar */}
-                <div
-                    className={`absolute left-0 top-0 bottom-0 w-80 bg-gray-50 shadow-xl transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-                        }`}
-                >
-                    {/* Sidebar Header */}
-                    <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                                <div className="w-5 h-5 border-2 border-white rounded-sm transform rotate-45"></div>
+                <div className="p-5">
+                    <div className="flex items-center justify-between mb-8">
+                        <Link href="/" className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-white flex items-center justify-center">
+                                <span className="text-black font-bold">D</span>
                             </div>
-                            <span className="text-lg font-bold">Digistore</span>
-                        </div>
+                            <span className="text-xl font-bold text-white">DigiStore</span>
+                        </Link>
                         <button
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="p-1 text-gray-500 hover:text-gray-700"
+                            className="text-white/50 hover:text-white"
                         >
                             <X className="w-6 h-6" />
                         </button>
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="p-4 bg-white border-b border-gray-200">
+                    <div className="space-y-6">
                         <div className="relative">
                             <input
                                 type="text"
-                                placeholder="Search here..."
-                                className="w-full px-4 py-2 pl-10 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                placeholder="Search..."
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-white/30"
                             />
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <Camera className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        </div>
-                    </div>
-
-                    {/* Navigation Links */}
-                    <div className="py-4">
-                        <Link
-                            href="/"
-                            className="flex items-center space-x-3 px-6 py-3 text-gray-700 hover:bg-white transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <Home className="w-5 h-5" />
-                            <span className="font-medium">Home</span>
-                        </Link>
-
-                        {/* Categories with Dropdown */}
-                        <div>
-                            <button
-                                onClick={() => setIsMobileCategoriesOpen(!isMobileCategoriesOpen)}
-                                className="flex items-center justify-between w-full px-6 py-3 text-gray-700 hover:bg-white transition-colors"
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <Grid className="w-5 h-5" />
-                                    <span className="font-medium">Categories</span>
-                                </div>
-                                <ChevronDown
-                                    className={`w-5 h-5 text-orange-500 transition-transform ${isMobileCategoriesOpen ? 'rotate-180' : ''
-                                        }`}
-                                />
-                            </button>
-
-                            {/* Categories Submenu */}
-                            {isMobileCategoriesOpen && (
-                                <div className="bg-white py-2">
-                                    {categories.map((category, index) => (
-                                        <Link
-                                            key={index}
-                                            href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                                            className="block px-12 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                        >
-                                            {category}
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
+                            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
                         </div>
 
-                        <Link
-                            href="/cart"
-                            className="flex items-center space-x-3 px-6 py-3 text-gray-700 hover:bg-white transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <ShoppingCart className="w-5 h-5" />
-                            <span className="font-medium">Cart</span>
-                        </Link>
+                        <div className="flex flex-col gap-4">
+                            <Link href="/" className="text-lg font-medium text-white">Home</Link>
+                            <Link href="/categories" className="text-lg font-medium text-white">Categories</Link>
+                            <Link href="/wishlist" className="text-lg font-medium text-white">Wishlist</Link>
+                            <Link href="/cart" className="text-lg font-medium text-white">Cart</Link>
+                        </div>
 
-                        <Link
-                            href="/orders"
-                            className="flex items-center space-x-3 px-6 py-3 text-gray-700 hover:bg-white transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <Package className="w-5 h-5" />
-                            <span className="font-medium">My Orders</span>
-                        </Link>
-
-                        <Link
-                            href="/auth"
-                            className="flex items-center space-x-3 px-6 py-3 text-gray-700 hover:bg-white transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <User className="w-5 h-5" />
-                            <span className="font-medium">Log In/Sign Up</span>
-                        </Link>
-                    </div>
-
-                    {/* Promotional Banner */}
-                    <div className="absolute bottom-20 left-0 right-0 px-6">
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <p className="text-sm font-semibold text-gray-800 mb-1">
-                                Get 50% Off on Selected Items
-                            </p>
-                            <Link
-                                href="/promotions"
-                                className="text-sm text-orange-500 font-medium hover:text-orange-600"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Shop Now
+                        <div className="pt-8 border-t border-white/10">
+                            <Link href="/auth" className="block w-full py-4 bg-white text-black text-center font-bold uppercase tracking-wide">
+                                Sign In / Sign Up
                             </Link>
                         </div>
-                    </div>
-
-                    {/* Social Links */}
-                    <div className="absolute bottom-4 left-0 right-0 px-6">
-                        <div className="flex items-center space-x-4 mb-3">
-                            <a href="#" className="text-gray-700 hover:text-gray-900">
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                </svg>
-                            </a>
-                            <a href="#" className="text-gray-700 hover:text-gray-900">
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                </svg>
-                            </a>
-                            <a href="#" className="text-gray-700 hover:text-gray-900">
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                </svg>
-                            </a>
-                        </div>
-                        <p className="text-xs text-gray-500">© 2077 Ravish. All rights reserved.</p>
                     </div>
                 </div>
             </div>
