@@ -17,6 +17,14 @@ export default function CartDrawer() {
     useGSAP(() => {
         const tl = gsap.timeline({ paused: true });
 
+        // Ensure initial state
+        gsap.set(drawerRef.current, { x: "100%" });
+        gsap.set(overlayRef.current, { opacity: 0, pointerEvents: "none" });
+
+        if (contentRef.current) {
+            gsap.set(contentRef.current.children, { y: 20, opacity: 0 });
+        }
+
         tl.to(overlayRef.current, {
             opacity: 1,
             pointerEvents: "all",
@@ -28,9 +36,9 @@ export default function CartDrawer() {
                 duration: 0.5,
                 ease: "power3.out"
             }, "-=0.3")
-            .from(contentRef.current!.children, {
-                y: 20,
-                opacity: 0,
+            .to(contentRef.current!.children, {
+                y: 0,
+                opacity: 1,
                 stagger: 0.05,
                 duration: 0.4,
                 ease: "power2.out"
@@ -42,11 +50,6 @@ export default function CartDrawer() {
         } else {
             tl.reverse();
             document.body.style.overflow = 'unset';
-            // Reset visibility after animation to prevent blocking clicks
-            gsap.to(overlayRef.current, {
-                pointerEvents: "none",
-                delay: 0.5
-            });
         }
 
     }, [isCartOpen]);
