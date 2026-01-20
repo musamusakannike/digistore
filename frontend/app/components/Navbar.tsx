@@ -14,6 +14,7 @@ import {
     Heart,
     ChevronDown,
 } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 // Register plugins
 gsap.registerPlugin(useGSAP);
@@ -34,6 +35,7 @@ export default function Navbar() {
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
+    const { toggleCart, cartItems } = useCart();
     const navRef = useRef<HTMLElement>(null);
 
     // Handle scroll effect
@@ -59,8 +61,8 @@ export default function Navbar() {
             <nav
                 ref={navRef}
                 className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
-                        ? "bg-black/80 backdrop-blur-md border-white/10 py-3"
-                        : "bg-transparent border-transparent py-5"
+                    ? "bg-black/80 backdrop-blur-md border-white/10 py-3"
+                    : "bg-transparent border-transparent py-5"
                     }`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,15 +137,17 @@ export default function Navbar() {
                                     <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                 </Link>
 
-                                <Link
-                                    href="/cart"
+                                <button
+                                    onClick={toggleCart}
                                     className="relative text-white/70 hover:text-white transition-colors group"
                                 >
                                     <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                    <span className="absolute -top-2 -right-2 w-4 h-4 bg-white text-black text-[10px] font-bold flex items-center justify-center rounded-full">
-                                        2
-                                    </span>
-                                </Link>
+                                    {cartItems.length > 0 && (
+                                        <span className="absolute -top-2 -right-2 w-4 h-4 bg-white text-black text-[10px] font-bold flex items-center justify-center rounded-full">
+                                            {cartItems.length}
+                                        </span>
+                                    )}
+                                </button>
 
                                 <Link
                                     href="/auth"
@@ -175,9 +179,11 @@ export default function Navbar() {
 
                         <Link href="/cart" className="relative text-white">
                             <ShoppingCart className="w-5 h-5" />
-                            <span className="absolute -top-2 -right-2 w-3.5 h-3.5 bg-white text-black text-[9px] font-bold flex items-center justify-center rounded-full">
-                                2
-                            </span>
+                            {cartItems.length > 0 && (
+                                <span className="absolute -top-2 -right-2 w-3.5 h-3.5 bg-white text-black text-[9px] font-bold flex items-center justify-center rounded-full">
+                                    {cartItems.length}
+                                </span>
+                            )}
                         </Link>
                     </div>
                 </div>

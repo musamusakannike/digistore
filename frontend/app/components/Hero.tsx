@@ -127,8 +127,8 @@ export default function Hero() {
                     {/* Left Content */}
                     <div ref={heroContentRef} className="text-center lg:text-left">
                         {/* Badge */}
-                        <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
-                            <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                        <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-0 border border-white/10 bg-white/5 backdrop-blur-md mb-8">
+                            <span className="flex h-2 w-2 rounded-0 bg-white animate-pulse" />
                             <span className="text-sm text-white/90 font-medium tracking-wide">
                                 NEW PRODUCTS ADDED DAILY
                             </span>
