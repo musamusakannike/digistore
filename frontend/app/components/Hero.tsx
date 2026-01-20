@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ArrowRight, Play, Star } from "lucide-react";
+import { ArrowRight, Play, Star, Briefcase } from "lucide-react";
 import Image from "next/image";
 
 // Register GSAP
@@ -159,6 +159,10 @@ export default function Hero() {
                                 <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
                                 <span>Watch Showreel</span>
                             </button>
+                            <a href="/seller/dashboard" className="btn-secondary flex items-center justify-center gap-2 group hover:bg-white/10">
+                                <Briefcase className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <span>Become Seller</span>
+                            </a>
                         </div>
 
                         {/* Stats */}
