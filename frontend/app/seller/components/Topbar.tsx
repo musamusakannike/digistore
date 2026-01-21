@@ -27,7 +27,7 @@ export default function Topbar() {
                         <div className="text-sm font-medium text-white">Alex Morgan</div>
                         <div className="text-xs text-gray-500">Premium Seller</div>
                     </div>
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 border border-white/20 overflow-hidden">
+                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-gray-200 to-gray-400 border border-white/20 overflow-hidden">
                         <User className="w-full h-full p-1 text-black" />
                     </div>
                 </div>

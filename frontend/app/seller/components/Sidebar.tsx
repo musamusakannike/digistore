@@ -42,7 +42,7 @@ export default function Sidebar() {
                             key={item.name}
                             href={item.href}
                             className={`
-                                flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                                flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-300
                                 ${isActive
                                     ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]"
                                     : "text-gray-400 hover:text-white hover:bg-white/5"
@@ -58,7 +58,7 @@ export default function Sidebar() {
 
             {/* Footer / Logout */}
             <div className="p-4 border-t border-white/10 bg-black/50">
-                <button className="flex items-center w-full gap-3 px-4 py-3 text-sm font-medium text-red-400 rounded-xl hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                <button className="flex items-center w-full gap-3 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
                     <LogOut className="w-5 h-5" />
                     Sign Out
                 </button>

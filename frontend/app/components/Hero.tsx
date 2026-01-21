@@ -155,10 +155,6 @@ export default function Hero() {
                                 <span>Explore Collection</span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
-                            <button className="btn-secondary flex items-center justify-center gap-2 group">
-                                <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
-                                <span>Watch Showreel</span>
-                            </button>
                             <a href="/seller/dashboard" className="btn-secondary flex items-center justify-center gap-2 group hover:bg-white/10">
                                 <Briefcase className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                 <span>Become Seller</span>

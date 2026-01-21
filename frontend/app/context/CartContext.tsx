@@ -8,7 +8,7 @@ const dummyCartItems = [
         id: 1,
         name: "Pro UI Kit Bundle",
         price: 49.00,
-        image: "https://images.unsplash.com/photo-1558655146-d09347e0b7a9?q=80&w=2670&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
         quantity: 1,
         category: "Templates"
     },

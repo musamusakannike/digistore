@@ -45,7 +45,7 @@ const orders = [
 
 export default function RecentOrders() {
     return (
-        <div className="glass-card rounded-2xl border border-white/10 overflow-hidden h-full">
+        <div className="glass-card border border-white/10 overflow-hidden h-full">
             <div className="p-6 border-b border-white/10 flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-semibold text-white">Recent Orders</h3>
@@ -73,13 +73,13 @@ export default function RecentOrders() {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500" />
+                                        {/* <div className="w-6 h-6 bg-linear-to-tr from-purple-500 to-blue-500" /> */}
                                         <span className="text-sm text-gray-300">{order.customer}</span>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className={`
-                                        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                                        inline-flex items-center px-2.5 py-0.5 text-xs font-medium border
                                         ${order.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : ''}
                                         ${order.status === 'Processing' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : ''}
                                         ${order.status === 'Failed' ? 'bg-red-500/10 text-red-400 border-red-500/20' : ''}

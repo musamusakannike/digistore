@@ -35,10 +35,10 @@ export default function DashboardStats() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
-                <div key={index} className="glass-card hover:translate-y-[-4px] transition-transform duration-300 p-6 rounded-2xl relative overflow-hidden group">
+                <div key={index} className="glass-card hover:translate-y-[-4px] transition-transform duration-300 p-6 relative overflow-hidden group">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-sm text-gray-400 font-medium">{stat.label}</span>
-                        <div className="p-2 bg-white/5 rounded-lg border border-white/10 group-hover:bg-white/10 transition-colors">
+                        <div className="p-2 bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
                             <stat.icon className="w-4 h-4 text-white" />
                         </div>
                     </div>

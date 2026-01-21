@@ -12,10 +12,10 @@ export default function SellerDashboard() {
                     <p className="text-gray-400 mt-1">Welcome back, Alex. Here's what's happening with your store.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/10">
+                    <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10">
                         Download Report
                     </button>
-                    <button className="px-4 py-2 bg-white text-black hover:bg-gray-200 rounded-lg text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    <button className="px-4 py-2 bg-white text-black hover:bg-gray-200 text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         Add New Product
                     </button>
                 </div>
