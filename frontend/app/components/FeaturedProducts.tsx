@@ -76,7 +76,7 @@ const ProductCard = ({ product, index }: { product: typeof featuredProducts[0]; 
     return (
         <div className="product-card-item group relative bg-[#0a0a0a] border border-white/5 hover:border-white/20 transition-all duration-500">
             {/* Image Container */}
-            <div className="relative aspect-[4/3] overflow-hidden bg-gray-900">
+            <div className="relative aspect-4/3 overflow-hidden bg-gray-900">
                 <Image
                     src={product.image}
                     alt={product.title}
@@ -103,7 +103,7 @@ const ProductCard = ({ product, index }: { product: typeof featuredProducts[0]; 
                         <ShoppingCart className="w-4 h-4" />
                     </button>
                     <Link
-                        href={`/product/${product.id}`}
+                        href={`/products`}
                         className="w-10 h-10 rounded-full bg-black/50 text-white hover:bg-white hover:text-black flex items-center justify-center backdrop-blur-md transition-colors"
                     >
                         <Eye className="w-4 h-4" />

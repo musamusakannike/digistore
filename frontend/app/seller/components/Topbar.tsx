@@ -1,8 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Bell, Search, User } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { apiFetch } from "../../lib/api";
 
 export default function Topbar() {
+    const { user } = useAuth();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                const res = await apiFetch<{ unreadCount: number }>("/notifications/unread-count", { method: "GET" });
+                if (!mounted) return;
+                setUnreadCount(res.unreadCount || 0);
+            } catch {
+                if (!mounted) return;
+                setUnreadCount(0);
+            }
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
     return (
         <header className="h-16 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-40">
             {/* Search (Dummy) */}
@@ -19,13 +42,15 @@ export default function Topbar() {
             <div className="flex items-center gap-4">
                 <button className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
                     <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></span>
+                    {unreadCount > 0 ? (
+                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-black"></span>
+                    ) : null}
                 </button>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                     <div className="text-right hidden sm:block">
-                        <div className="text-sm font-medium text-white">Alex Morgan</div>
-                        <div className="text-xs text-gray-500">Premium Seller</div>
+                        <div className="text-sm font-medium text-white">{user ? `${user.firstName} ${user.lastName}` : ""}</div>
+                        <div className="text-xs text-gray-500">{user?.role === "seller" ? "Seller" : user?.role === "admin" ? "Admin" : "Buyer"}</div>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-linear-to-br from-gray-200 to-gray-400 border border-white/20 overflow-hidden">
                         <User className="w-full h-full p-1 text-black" />

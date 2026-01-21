@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Package,
@@ -11,6 +11,7 @@ import {
     LogOut,
     Store
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const navigation = [
     { name: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
@@ -22,6 +23,13 @@ const navigation = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const { logout } = useAuth();
+
+    const handleLogout = async () => {
+        await logout();
+        router.push("/");
+    };
 
     return (
         <aside className="fixed inset-y-0 left-0 w-64 bg-[#0a0a0a] border-r border-white/10 flex flex-col z-50">
@@ -36,7 +44,7 @@ export default function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                 {navigation.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
                     return (
                         <Link
                             key={item.name}
@@ -58,7 +66,10 @@ export default function Sidebar() {
 
             {/* Footer / Logout */}
             <div className="p-4 border-t border-white/10 bg-black/50">
-                <button className="flex items-center w-full gap-3 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full gap-3 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                >
                     <LogOut className="w-5 h-5" />
                     Sign Out
                 </button>

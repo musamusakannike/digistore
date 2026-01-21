@@ -1,23 +1,34 @@
+"use client";
+
+import Link from "next/link";
 import DashboardStats from "../components/DashboardStats";
 import RevenueChart from "../components/RevenueChart";
 import RecentOrders from "../components/RecentOrders";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SellerDashboard() {
+    const { user } = useAuth();
+
     return (
         <>
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-                    <p className="text-gray-400 mt-1">Welcome back, Alex. Here's what's happening with your store.</p>
+                    <p className="text-gray-400 mt-1">
+                        Welcome back{user ? `, ${user.firstName}` : ""}. Here's what's happening with your store.
+                    </p>
                 </div>
                 <div className="flex gap-3">
                     <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10">
                         Download Report
                     </button>
-                    <button className="px-4 py-2 bg-white text-black hover:bg-gray-200 text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    <Link
+                        href="/seller/products"
+                        className="px-4 py-2 bg-white text-black hover:bg-gray-200 text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    >
                         Add New Product
-                    </button>
+                    </Link>
                 </div>
             </div>
 

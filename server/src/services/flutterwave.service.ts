@@ -45,7 +45,9 @@ export class FlutterwaveService {
     this.secretKey = process.env.FLUTTERWAVE_SECRET_KEY || ""
     this.publicKey = process.env.FLUTTERWAVE_PUBLIC_KEY || ""
     this.encryptionKey = process.env.FLUTTERWAVE_ENCRYPTION_KEY || ""
+  }
 
+  private ensureConfigured() {
     if (!this.secretKey || !this.publicKey) {
       throw new Error("Flutterwave credentials not configured")
     }
@@ -53,6 +55,7 @@ export class FlutterwaveService {
 
   async initializePayment(data: InitializePaymentData): Promise<any> {
     try {
+      this.ensureConfigured()
       const response = await axios.post(
         `${FLUTTERWAVE_BASE_URL}/payments`,
         {
@@ -90,6 +93,7 @@ export class FlutterwaveService {
 
   async verifyPayment(transactionId: string): Promise<VerifyPaymentResponse> {
     try {
+      this.ensureConfigured()
       const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}/verify`, {
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
@@ -105,6 +109,7 @@ export class FlutterwaveService {
 
   async verifyPaymentByReference(reference: string): Promise<VerifyPaymentResponse> {
     try {
+      this.ensureConfigured()
       const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/verify_by_reference`, {
         params: { tx_ref: reference },
         headers: {
@@ -126,6 +131,7 @@ export class FlutterwaveService {
 
   async getTransaction(transactionId: string): Promise<any> {
     try {
+      this.ensureConfigured()
       const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}`, {
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
@@ -141,6 +147,7 @@ export class FlutterwaveService {
 
   async refundPayment(transactionId: string, amount?: number): Promise<any> {
     try {
+      this.ensureConfigured()
       const response = await axios.post(
         `${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}/refund`,
         {

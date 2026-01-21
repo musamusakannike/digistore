@@ -4,9 +4,13 @@ import { useCart } from "../context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowRight, ArrowLeft, ShoppingBag } from "lucide-react";
+import { formatNaira } from "../lib/money";
 
 export default function CartPage() {
-    const { cartItems, cartTotal } = useCart();
+    const { cartItems, cartTotal, updateItemQuantity, removeItem } = useCart();
+
+    const tax = cartTotal * 0.075;
+    const total = cartTotal + tax;
 
     return (
         <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-[#000000]">
@@ -56,20 +60,29 @@ export default function CartPage() {
                                                 <h3 className="text-lg font-bold text-white mb-1">{item.name}</h3>
                                                 <p className="text-sm text-white/40">{item.category}</p>
                                             </div>
-                                            <p className="text-xl font-bold text-white">${item.price}</p>
+                                            <p className="text-xl font-bold text-white">{formatNaira(item.price)}</p>
                                         </div>
 
                                         <div className="flex items-center justify-between mt-4 sm:mt-0">
                                             <div className="flex items-center gap-4 bg-white/5 rounded-xl px-3 py-1.5 border border-white/5">
-                                                <button className="text-white/40 hover:text-white transition-colors p-1">
+                                                <button
+                                                    onClick={() => updateItemQuantity({ productId: item.id, quantity: Math.max(1, item.quantity - 1) })}
+                                                    className="text-white/40 hover:text-white transition-colors p-1"
+                                                >
                                                     <Minus className="w-4 h-4" />
                                                 </button>
                                                 <span className="text-sm font-bold text-white w-4 text-center">{item.quantity}</span>
-                                                <button className="text-white/40 hover:text-white transition-colors p-1">
+                                                <button
+                                                    onClick={() => updateItemQuantity({ productId: item.id, quantity: item.quantity + 1 })}
+                                                    className="text-white/40 hover:text-white transition-colors p-1"
+                                                >
                                                     <Plus className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <button className="flex items-center gap-2 text-white/40 hover:text-red-400 transition-colors text-sm font-medium pr-2">
+                                            <button
+                                                onClick={() => removeItem(item.id)}
+                                                className="flex items-center gap-2 text-white/40 hover:text-red-400 transition-colors text-sm font-medium pr-2"
+                                            >
                                                 <Trash2 className="w-4 h-4" />
                                                 <span className="hidden sm:inline">Remove</span>
                                             </button>
@@ -87,29 +100,28 @@ export default function CartPage() {
                                 <div className="space-y-4 mb-6">
                                     <div className="flex items-center justify-between text-white/60">
                                         <span>Subtotal</span>
-                                        <span className="text-white font-medium">${cartTotal.toFixed(2)}</span>
+                                        <span className="text-white font-medium">{formatNaira(cartTotal)}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-white/60">
-                                        <span>Discount</span>
-                                        <span className="text-green-400 font-medium">-$0.00</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-white/60">
-                                        <span>Taxes</span>
-                                        <span className="text-white/40 italic">Calculated at checkout</span>
+                                        <span>VAT (7.5%)</span>
+                                        <span className="text-white font-medium">{formatNaira(tax)}</span>
                                     </div>
                                     <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                                         <span className="text-lg font-bold text-white">Total</span>
-                                        <span className="text-2xl font-bold text-white">${cartTotal.toFixed(2)}</span>
+                                        <span className="text-2xl font-bold text-white">{formatNaira(total)}</span>
                                     </div>
                                 </div>
 
-                                <button className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-transform active:scale-95 flex items-center justify-center gap-2 group mb-3 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                                <Link
+                                    href="/checkout"
+                                    className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-transform active:scale-95 flex items-center justify-center gap-2 group mb-3 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                                >
                                     Checkout Now
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </Link>
 
                                 <p className="text-xs text-center text-white/30">
-                                    Secure checkout powered by Stripe
+                                    Secure checkout powered by Flutterwave
                                 </p>
                             </div>
                         </div>

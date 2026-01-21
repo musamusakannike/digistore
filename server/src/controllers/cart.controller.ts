@@ -12,7 +12,10 @@ type AuthRequest = Request & { user?: IUser }
 // @route   GET /api/v1/cart
 // @access  Private
 export const getCart = asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response, next: NextFunction) => {
-  let cart = await Cart.findOne({ user: req.user?._id }).populate("items.product")
+  let cart = await Cart.findOne({ user: req.user?._id }).populate({
+    path: "items.product",
+    populate: { path: "category", select: "name slug" },
+  })
 
   if (!cart) {
     cart = await Cart.create({ user: req.user?._id, items: [] })
@@ -96,7 +99,10 @@ export const addToCart = asyncHandler<AuthRequest>(async (req: AuthRequest, res:
   }
 
   await cart.save()
-  await cart.populate("items.product")
+  await cart.populate({
+    path: "items.product",
+    populate: { path: "category", select: "name slug" },
+  })
 
   sendSuccess(res, 200, "Item added to cart", { cart })
 })
@@ -126,7 +132,10 @@ export const updateCartItem = asyncHandler<AuthRequest>(async (req: AuthRequest,
 
   item.quantity = quantity
   await cart.save()
-  await cart.populate("items.product")
+  await cart.populate({
+    path: "items.product",
+    populate: { path: "category", select: "name slug" },
+  })
 
   sendSuccess(res, 200, "Cart item updated", { cart })
 })
@@ -145,7 +154,10 @@ export const removeFromCart = asyncHandler<AuthRequest>(async (req: AuthRequest,
 
   cart.items = cart.items.filter((item) => item.product.toString() !== productId)
   await cart.save()
-  await cart.populate("items.product")
+  await cart.populate({
+    path: "items.product",
+    populate: { path: "category", select: "name slug" },
+  })
 
   sendSuccess(res, 200, "Item removed from cart", { cart })
 })

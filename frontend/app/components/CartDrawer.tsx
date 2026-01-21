@@ -7,12 +7,16 @@ import { X, Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useCart } from "../context/CartContext";
+import { formatNaira } from "../lib/money";
 
 export default function CartDrawer() {
-    const { isCartOpen, closeCart, cartItems, cartTotal } = useCart();
+    const { isCartOpen, closeCart, cartItems, cartTotal, updateItemQuantity, removeItem } = useCart();
     const drawerRef = useRef<HTMLDivElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    const tax = cartTotal * 0.075;
+    const total = cartTotal + tax;
 
     useGSAP(() => {
         const tl = gsap.timeline({ paused: true });
@@ -117,22 +121,31 @@ export default function CartDrawer() {
                                         <div>
                                             <div className="flex justify-between items-start gap-2">
                                                 <h3 className="text-sm font-semibold text-white truncate pr-2">{item.name}</h3>
-                                                <p className="text-sm font-bold text-white">${item.price}</p>
+                                                <p className="text-sm font-bold text-white">{formatNaira(item.price)}</p>
                                             </div>
                                             <p className="text-xs text-white/40 mt-1">{item.category}</p>
                                         </div>
 
                                         <div className="flex items-center justify-between mt-2">
                                             <div className="flex items-center gap-3 bg-white/5 rounded-lg px-2 py-1 border border-white/5">
-                                                <button className="text-white/40 hover:text-white transition-colors">
+                                                <button
+                                                    onClick={() => updateItemQuantity({ productId: item.id, quantity: Math.max(1, item.quantity - 1) })}
+                                                    className="text-white/40 hover:text-white transition-colors"
+                                                >
                                                     <Minus className="w-3 h-3" />
                                                 </button>
                                                 <span className="text-xs font-medium text-white w-3 text-center">{item.quantity}</span>
-                                                <button className="text-white/40 hover:text-white transition-colors">
+                                                <button
+                                                    onClick={() => updateItemQuantity({ productId: item.id, quantity: item.quantity + 1 })}
+                                                    className="text-white/40 hover:text-white transition-colors"
+                                                >
                                                     <Plus className="w-3 h-3" />
                                                 </button>
                                             </div>
-                                            <button className="text-white/40 hover:text-red-400 transition-colors p-1">
+                                            <button
+                                                onClick={() => removeItem(item.id)}
+                                                className="text-white/40 hover:text-red-400 transition-colors p-1"
+                                            >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -148,21 +161,25 @@ export default function CartDrawer() {
                             <div className="space-y-3 mb-6">
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-white/60">Subtotal</span>
-                                    <span className="text-white font-medium">${cartTotal.toFixed(2)}</span>
+                                    <span className="text-white font-medium">{formatNaira(cartTotal)}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-white/60">Taxes</span>
-                                    <span className="text-white/40 italic">Calculated at checkout</span>
+                                    <span className="text-white/60">VAT (7.5%)</span>
+                                    <span className="text-white font-medium">{formatNaira(tax)}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-white/60">Delivery</span>
+                                    <span className="text-white/40 italic">Digital (instant)</span>
                                 </div>
                                 <div className="pt-3 border-t border-white/10 flex items-center justify-between">
                                     <span className="text-white font-bold">Total</span>
-                                    <span className="text-xl font-bold text-white">${cartTotal.toFixed(2)}</span>
+                                    <span className="text-xl font-bold text-white">{formatNaira(total)}</span>
                                 </div>
                             </div>
 
                             <div className="grid gap-3">
                                 <Link
-                                    href="/cart"
+                                    href="/checkout"
                                     onClick={closeCart}
                                     className="w-full py-3.5 bg-white text-black font-bold text-center rounded-xl hover:bg-gray-200 transition-transform active:scale-95 flex items-center justify-center gap-2 group"
                                 >

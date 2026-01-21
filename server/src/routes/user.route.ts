@@ -23,6 +23,9 @@ import {
 
 const router = Router()
 
+// Public route to get all sellers
+router.get("/sellers", getAllSellers)
+
 // All routes are protected
 router.use(protect)
 
@@ -36,8 +39,5 @@ router.post("/wishlist/:productId", addToWishlist)
 router.delete("/wishlist/:productId", removeFromWishlist)
 router.get("/wishlist", getWishlist)
 router.post("/push-token", updatePushToken)
-
-// Public route to get all sellers
-router.get("/sellers", getAllSellers)
 
 export default router

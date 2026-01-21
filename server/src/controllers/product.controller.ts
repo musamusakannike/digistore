@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express"
 import type { IUser } from "../models/user.model"
+import mongoose from "mongoose"
 import Product from "../models/product.model"
 import Category from "../models/category.model"
 import { asyncHandler } from "../utils/asynchandler.util"
@@ -27,7 +28,25 @@ export const getProducts = asyncHandler<AuthRequest>(async (req: AuthRequest, re
     query.status = "approved"
   }
 
-  if (category) query.category = category
+  if (category) {
+    const raw = category as string
+    const parts = raw
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean)
+
+    const ids = parts.filter((p) => mongoose.Types.ObjectId.isValid(p))
+    const slugs = parts.filter((p) => !mongoose.Types.ObjectId.isValid(p))
+
+    if (slugs.length > 0) {
+      const categories = await Category.find({ slug: { $in: slugs } }).select("_id")
+      ids.push(...categories.map((c) => c._id.toString()))
+    }
+
+    if (ids.length > 0) {
+      query.category = ids.length > 1 ? { $in: ids } : ids[0]
+    }
+  }
   if (seller) query.seller = seller
   if (status) query.status = status
   if (isFeatured) query.isFeatured = isFeatured === "true"

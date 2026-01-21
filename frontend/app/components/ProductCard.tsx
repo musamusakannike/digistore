@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Star, ShoppingCart, ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { formatNaira } from "../lib/money";
 
 interface ProductCardProps {
-    id: number;
+    id: string;
     image: string;
     title: string;
     category: string;
@@ -16,9 +19,11 @@ interface ProductCardProps {
     originalPrice?: number;
     discountPercent?: number;
     author?: string;
+    slug?: string;
 }
 
 export default function ProductCard({
+    id,
     image,
     title,
     category,
@@ -29,9 +34,11 @@ export default function ProductCard({
     originalPrice,
     discountPercent,
     author,
+    slug,
 }: ProductCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const { addItem } = useCart();
 
     // Truncate description to 100 characters
     const truncatedDescription = description.length > 100
@@ -72,14 +79,16 @@ export default function ProductCard({
             )}
 
             {/* Product Image */}
-            <div className="relative w-full aspect-[4/3] bg-gray-900 overflow-hidden">
-                <Image
-                    src={image}
-                    alt={title}
-                    fill
-                    className={`object-cover transition-transform duration-700 grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100 ${isHovered ? "scale-105" : "scale-100"
-                        }`}
-                />
+            <div className="relative w-full aspect-4/3 bg-gray-900 overflow-hidden">
+                <Link href={slug ? `/product/${slug}` : `/products`} className="block absolute inset-0">
+                    <Image
+                        src={image}
+                        alt={title}
+                        fill
+                        className={`object-cover transition-transform duration-700 grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100 ${isHovered ? "scale-105" : "scale-100"
+                            }`}
+                    />
+                </Link>
 
                 {/* Overlay on hover */}
                 <div
@@ -96,9 +105,11 @@ export default function ProductCard({
                 </span>
 
                 {/* Title */}
-                <h3 className="text-lg font-medium text-white mb-2 line-clamp-1 group-hover:text-white/80 transition-colors">
-                    {title}
-                </h3>
+                <Link href={slug ? `/product/${slug}` : `/products`} className="block">
+                    <h3 className="text-lg font-medium text-white mb-2 line-clamp-1 group-hover:text-white/80 transition-colors">
+                        {title}
+                    </h3>
+                </Link>
 
                 {/* Author */}
                 {author && (
@@ -120,17 +131,18 @@ export default function ProductCard({
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-bold text-white">
-                                ${price.toFixed(2)}
+                                {formatNaira(price)}
                             </span>
                             {originalPrice && (
                                 <span className="text-sm text-white/30 line-through">
-                                    ${originalPrice.toFixed(2)}
+                                    {formatNaira(originalPrice)}
                                 </span>
                             )}
                         </div>
                     </div>
 
                     <button
+                        onClick={() => addItem({ productId: id, quantity: 1 })}
                         className="flex items-center gap-2 bg-white/10 hover:bg-white text-white hover:text-black px-4 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-300"
                     >
                         <ShoppingCart size={14} />

@@ -2,21 +2,30 @@
 
 import { useState, useEffect, useRef } from "react";
 
-interface PriceRangeSliderProps {
-    minPrice: number;
-    maxPrice: number;
-    minValue: number;
-    maxValue: number;
-    onChange: (min: number, max: number) => void;
-}
+type PriceRangeSliderProps =
+    | {
+        minPrice: number;
+        maxPrice: number;
+        minValue: number;
+        maxValue: number;
+        onChange: (min: number, max: number) => void;
+    }
+    | {
+        min: number;
+        max: number;
+        value: [number, number];
+        onChange: (min: number, max: number) => void;
+    };
 
 export default function PriceRangeSlider({
-    minPrice,
-    maxPrice,
-    minValue,
-    maxValue,
     onChange,
+    ...rest
 }: PriceRangeSliderProps) {
+    const minPrice = "minPrice" in rest ? rest.minPrice : rest.min;
+    const maxPrice = "maxPrice" in rest ? rest.maxPrice : rest.max;
+    const minValue = "minValue" in rest ? rest.minValue : rest.value[0];
+    const maxValue = "maxValue" in rest ? rest.maxValue : rest.value[1];
+
     const [localMin, setLocalMin] = useState(minValue);
     const [localMax, setLocalMax] = useState(maxValue);
     const trackRef = useRef<HTMLDivElement>(null);

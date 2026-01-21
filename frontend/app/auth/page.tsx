@@ -2,14 +2,24 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 export default function SignUpPage() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [role, setRole] = useState<"buyer" | "seller">("buyer");
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const { register } = useAuth();
 
     useGSAP(() => {
         gsap.fromTo(".auth-content",
@@ -20,10 +30,16 @@ export default function SignUpPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setIsLoading(false);
+        try {
+            setIsLoading(true);
+            setError(null);
+            await register({ firstName, lastName, email, password, role });
+            router.push("/");
+        } catch (e: any) {
+            setError(e?.message || "Failed to create account");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -33,7 +49,7 @@ export default function SignUpPage() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-gray-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-            <div ref={containerRef} className="w-full max-w-[500px] p-6 relative z-10">
+            <div ref={containerRef} className="w-full max-w-125 p-6 relative z-10">
                 <div className="glass-card rounded-0 p-8 md:p-10 border border-white/10">
                     {/* Header */}
                     <div className="auth-content flex items-center justify-between mb-10">
@@ -51,6 +67,12 @@ export default function SignUpPage() {
                         <p className="text-gray-400">Join the premium marketplace for creators</p>
                     </div>
 
+                    {error ? (
+                        <div className="auth-content bg-red-500/10 border border-red-500/20 p-4 text-red-300 mb-6">
+                            {error}
+                        </div>
+                    ) : null}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name Fields */}
                         <div className="auth-content flex flex-col md:flex-row gap-4">
@@ -60,6 +82,8 @@ export default function SignUpPage() {
                                     type="text"
                                     id="firstName"
                                     placeholder="John"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
                                     className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
                                     required
                                 />
@@ -70,6 +94,8 @@ export default function SignUpPage() {
                                     type="text"
                                     id="lastName"
                                     placeholder="Doe"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
                                     required
                                 />
@@ -83,9 +109,24 @@ export default function SignUpPage() {
                                 type="email"
                                 id="email"
                                 placeholder="john@example.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
                                 required
                             />
+
+                        <div className="auth-content space-y-2">
+                            <label htmlFor="role" className="text-sm font-medium text-gray-400 ml-1">Account type</label>
+                            <select
+                                id="role"
+                                value={role}
+                                onChange={(e) => setRole(e.target.value as any)}
+                                className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all"
+                            >
+                                <option value="buyer">Buyer</option>
+                                <option value="seller">Seller</option>
+                            </select>
+                        </div>
                         </div>
 
                         {/* Password */}
@@ -96,6 +137,8 @@ export default function SignUpPage() {
                                     type={showPassword ? "text" : "password"}
                                     id="password"
                                     placeholder="Create a strong password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full bg-[#0a0a0a] border border-white/10 rounded-0 px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all pr-12"
                                     required
                                 />

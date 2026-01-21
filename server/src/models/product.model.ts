@@ -91,7 +91,7 @@ const productSchema = new Schema<IProduct>(
     },
     thumbnail: {
       type: String,
-      required: [true, "Thumbnail is required"],
+      default: "",
     },
     images: [
       {

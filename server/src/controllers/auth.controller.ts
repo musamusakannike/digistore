@@ -61,7 +61,7 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   })
 
@@ -75,6 +75,7 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
       isEmailVerified: user.isEmailVerified,
     },
     accessToken,
+    refreshToken,
   })
 })
 
@@ -128,7 +129,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 30 * 24 * 60 * 60 * 1000,
   })
 
@@ -143,6 +144,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
       avatar: user.avatar,
     },
     accessToken,
+    refreshToken,
   })
 })
 
@@ -150,7 +152,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
 // @route   POST /api/v1/auth/refresh
 // @access  Public
 export const refreshAccessToken = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const { refreshToken } = req.cookies
+  const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken
 
   if (!refreshToken) {
     return sendError(res, 401, "Refresh token not found")
@@ -189,7 +191,11 @@ export const logout = asyncHandler(async (req: Request, res: Response, next: Nex
     await user.save()
   }
 
-  res.clearCookie("refreshToken")
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  })
   sendSuccess(res, 200, "Logout successful")
 })
 

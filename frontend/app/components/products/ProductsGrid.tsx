@@ -4,7 +4,7 @@ import ProductCard from "../ProductCard";
 import { Package } from "lucide-react";
 
 interface Product {
-    id: number;
+    id: string;
     image: string;
     title: string;
     category: string;
@@ -15,6 +15,7 @@ interface Product {
     originalPrice?: number;
     discountPercent?: number;
     author?: string;
+    slug?: string;
 }
 
 interface ProductsGridProps {
