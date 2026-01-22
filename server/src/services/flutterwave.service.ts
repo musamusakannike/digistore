@@ -1,5 +1,4 @@
 import axios from "axios"
-import crypto from "crypto"
 
 const FLUTTERWAVE_BASE_URL = "https://api.flutterwave.com/v3"
 
@@ -24,7 +23,7 @@ interface VerifyPaymentResponse {
     amount: number
     currency: string
     charged_amount: number
-    status: string
+    status: string // "successful" | "failed" | "pending"
     payment_type: string
     customer: {
       id: number
@@ -39,23 +38,23 @@ interface VerifyPaymentResponse {
 export class FlutterwaveService {
   private secretKey: string
   private publicKey: string
-  private encryptionKey: string
+  private webhookSecret: string
 
   constructor() {
     this.secretKey = process.env.FLUTTERWAVE_SECRET_KEY || ""
     this.publicKey = process.env.FLUTTERWAVE_PUBLIC_KEY || ""
-    this.encryptionKey = process.env.FLUTTERWAVE_ENCRYPTION_KEY || ""
+    this.webhookSecret = process.env.FLUTTERWAVE_WEBHOOK_SECRET || ""
   }
 
   private ensureConfigured() {
     if (!this.secretKey || !this.publicKey) {
-      throw new Error("Flutterwave credentials not configured")
+      throw new Error("Flutterwave API keys not configured")
     }
   }
 
   async initializePayment(data: InitializePaymentData): Promise<any> {
+    this.ensureConfigured()
     try {
-      this.ensureConfigured()
       const response = await axios.post(
         `${FLUTTERWAVE_BASE_URL}/payments`,
         {
@@ -81,95 +80,115 @@ export class FlutterwaveService {
             Authorization: `Bearer ${this.secretKey}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       )
 
       return response.data
     } catch (error: any) {
-      console.error("Flutterwave initialization error:", error.response?.data || error.message)
-      throw new Error(error.response?.data?.message || "Failed to initialize payment")
+      this.handleError(error, "initialize payment")
     }
   }
 
   async verifyPayment(transactionId: string): Promise<VerifyPaymentResponse> {
+    this.ensureConfigured()
     try {
-      this.ensureConfigured()
-      const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}/verify`, {
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
-      })
-
+      const response = await axios.get(
+        `${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}/verify`,
+        {
+          headers: { Authorization: `Bearer ${this.secretKey}` },
+        }
+      )
       return response.data
     } catch (error: any) {
-      console.error("Flutterwave verification error:", error.response?.data || error.message)
-      throw new Error(error.response?.data?.message || "Failed to verify payment")
+      this.handleError(error, "verify payment")
+      throw error // Ensure flow breaks if verification fails
     }
   }
 
+  /**
+   * CORRECTED: Flutterwave V3 does not have a verify_by_reference endpoint.
+   * We must query transactions by tx_ref to find the ID or status.
+   */
   async verifyPaymentByReference(reference: string): Promise<VerifyPaymentResponse> {
+    this.ensureConfigured()
     try {
-      this.ensureConfigured()
-      const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/verify_by_reference`, {
+      // 1. Search for the transaction by reference
+      const searchResponse = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions`, {
         params: { tx_ref: reference },
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
+        headers: { Authorization: `Bearer ${this.secretKey}` },
       })
 
-      return response.data
+      const transactions = searchResponse.data.data
+      
+      if (!transactions || transactions.length === 0) {
+        throw new Error("Transaction reference not found")
+      }
+
+      // 2. Get the specific transaction ID
+      const transactionId = transactions[0].id
+
+      // 3. Perform the standard verification using the ID
+      // (This is safer than trusting the search result status directly)
+      return this.verifyPayment(transactionId.toString())
+
     } catch (error: any) {
-      console.error("Flutterwave verification error:", error.response?.data || error.message)
-      throw new Error(error.response?.data?.message || "Failed to verify payment")
+      this.handleError(error, "verify payment by reference")
+      throw error
     }
   }
 
-  verifyWebhookSignature(signature: string, payload: any): boolean {
-    const hash = crypto.createHmac("sha256", this.secretKey).update(JSON.stringify(payload)).digest("hex")
-    return hash === signature
+  /**
+   * CORRECTED: Flutterwave webhooks use a static Secret Hash, not HMAC signature.
+   * Compare the `verif-hash` header from the request with your ENV secret.
+   */
+  verifyWebhookSignature(signatureFromHeader: string): boolean {
+    if (!this.webhookSecret) {
+      console.warn("FLUTTERWAVE_WEBHOOK_SECRET is not set")
+      return false
+    }
+    return signatureFromHeader === this.webhookSecret
   }
 
   async getTransaction(transactionId: string): Promise<any> {
+    this.ensureConfigured()
     try {
-      this.ensureConfigured()
       const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}`, {
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
+        headers: { Authorization: `Bearer ${this.secretKey}` },
       })
-
       return response.data
     } catch (error: any) {
-      console.error("Flutterwave get transaction error:", error.response?.data || error.message)
-      throw new Error(error.response?.data?.message || "Failed to get transaction")
+      this.handleError(error, "get transaction")
     }
   }
 
   async refundPayment(transactionId: string, amount?: number): Promise<any> {
+    this.ensureConfigured()
     try {
-      this.ensureConfigured()
       const response = await axios.post(
         `${FLUTTERWAVE_BASE_URL}/transactions/${transactionId}/refund`,
-        {
-          amount,
-        },
+        { amount },
         {
           headers: {
             Authorization: `Bearer ${this.secretKey}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       )
-
       return response.data
     } catch (error: any) {
-      console.error("Flutterwave refund error:", error.response?.data || error.message)
-      throw new Error(error.response?.data?.message || "Failed to process refund")
+      this.handleError(error, "refund payment")
     }
   }
 
   getPublicKey(): string {
     return this.publicKey
+  }
+
+  // Helper to standardize error logging
+  private handleError(error: any, context: string) {
+    const errorMessage = error.response?.data?.message || error.message
+    console.error(`Flutterwave ${context} error:`, error.response?.data || error.message)
+    throw new Error(errorMessage || `Failed to ${context}`)
   }
 }
 
