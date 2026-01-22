@@ -24,7 +24,7 @@ export default function SellerDashboard() {
                         Download Report
                     </button>
                     <Link
-                        href="/seller/products"
+                        href="/seller/products/create"
                         className="px-4 py-2 bg-white text-black hover:bg-gray-200 text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                     >
                         Add New Product

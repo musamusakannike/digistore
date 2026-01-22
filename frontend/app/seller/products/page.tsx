@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { apiFetchEnvelope, type Pagination } from "../../lib/api";
 import { formatNaira } from "../../lib/money";
@@ -73,6 +74,12 @@ export default function SellerProductsPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/seller/products/create"
+            className="px-4 py-2 bg-white text-black hover:bg-gray-200 text-sm font-bold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+          >
+            Add Product
+          </Link>
           <select
             value={status}
             onChange={(e) => {
