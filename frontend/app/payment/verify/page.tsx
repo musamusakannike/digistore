@@ -1,12 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 
 export default function PaymentVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-black pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-[#0a0a0a] border border-white/10 p-10 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-white" />
+                <h1 className="text-2xl font-bold text-white">Verifying payment</h1>
+                <p className="text-white/50">Please wait while we confirm your transaction.</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      }
+    >
+      <PaymentVerifyInner />
+    </Suspense>
+  );
+}
+
+function PaymentVerifyInner() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
 
@@ -26,7 +48,7 @@ export default function PaymentVerifyPage() {
     (async () => {
       try {
         setIsLoading(true);
-        const res = await apiFetch<{ transaction: any; order: any }>(`/payments/verify/${reference}`, { method: "GET" });
+        await apiFetch<{ transaction: any; order: any }>(`/payments/verify/${reference}`, { method: "GET" });
         if (!mounted) return;
         setIsSuccess(true);
         setMessage("Payment verified successfully. Your downloads are ready.");
