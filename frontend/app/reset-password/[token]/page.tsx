@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch } from "../../lib/api";
 
 export default function ResetPasswordPage() {
   const params = useParams<{ token: string }>();
