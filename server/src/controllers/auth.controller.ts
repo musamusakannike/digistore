@@ -42,13 +42,13 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 
   // Generate tokens
   const accessToken = generateAccessToken({
-    userId: user._id,
+    userId: user._id.toString(),
     email: user.email,
     role: user.role,
   })
 
   const refreshToken = generateRefreshToken({
-    userId: user._id,
+    userId: user._id.toString(),
     email: user.email,
     role: user.role,
   })
@@ -109,13 +109,13 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
 
   // Generate tokens
   const accessToken = generateAccessToken({
-    userId: user._id,
+    userId: user._id.toString(),
     email: user.email,
     role: user.role,
   })
 
   const refreshToken = generateRefreshToken({
-    userId: user._id,
+    userId: user._id.toString(),
     email: user.email,
     role: user.role,
   })
@@ -167,7 +167,7 @@ export const refreshAccessToken = asyncHandler(async (req: Request, res: Respons
     }
 
     const newAccessToken = generateAccessToken({
-      userId: user._id,
+      userId: user._id.toString(),
       email: user.email,
       role: user.role,
     })
@@ -205,7 +205,8 @@ export const logout = asyncHandler(async (req: Request, res: Response, next: Nex
 export const verifyEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.params
 
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex")
+  const tokenValue = Array.isArray(token) ? token[0] : token
+  const hashedToken = crypto.createHash("sha256").update(tokenValue).digest("hex")
 
   const user = await User.findOne({
     emailVerificationToken: hashedToken,
@@ -282,7 +283,8 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response, ne
   const { token } = req.params
   const { password } = req.body
 
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex")
+  const tokenValue = Array.isArray(token) ? token[0] : token
+  const hashedToken = crypto.createHash("sha256").update(tokenValue).digest("hex")
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,

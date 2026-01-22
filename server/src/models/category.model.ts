@@ -1,7 +1,6 @@
 import mongoose, { type Document, Schema } from "mongoose"
 
 export interface ICategory extends Document {
-  _id: string
   name: string
   slug: string
   description?: string

@@ -1,7 +1,6 @@
 import mongoose, { type Document, Schema } from "mongoose"
 
 export interface ITransaction extends Document {
-  _id: string
   user: mongoose.Types.ObjectId
   order: mongoose.Types.ObjectId
   amount: number

@@ -1,7 +1,6 @@
 import mongoose, { type Document, Schema } from "mongoose"
 
 export interface IReview extends Document {
-  _id: string
   product: mongoose.Types.ObjectId
   user: mongoose.Types.ObjectId
   rating: number

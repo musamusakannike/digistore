@@ -9,7 +9,6 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-  _id: string
   buyer: mongoose.Types.ObjectId
   items: IOrderItem[]
   subtotal: number

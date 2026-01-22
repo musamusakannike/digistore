@@ -75,7 +75,9 @@ export const initializePayment = asyncHandler(async (req: Request, res: Response
 export const verifyPayment = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { reference } = req.params
 
-  const transaction = await Transaction.findOne({ reference }).populate({
+  const referenceValue = Array.isArray(reference) ? reference[0] : reference
+
+  const transaction = await Transaction.findOne({ reference: referenceValue }).populate({
     path: "order",
     populate: {
       path: "items.product",
@@ -98,7 +100,7 @@ export const verifyPayment = asyncHandler(async (req: Request, res: Response, ne
   }
 
   // Verify with Flutterwave
-  const verification = await flutterwaveService.verifyPaymentByReference(reference)
+  const verification = await flutterwaveService.verifyPaymentByReference(referenceValue)
 
   if (verification.status === "success" && verification.data.status === "successful") {
     // Update transaction
