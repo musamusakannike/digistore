@@ -23,7 +23,10 @@ const httpServer = createServer(app)
 // Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      callback(null, true);
+    },
     credentials: true,
   },
 })
@@ -39,7 +42,10 @@ app.set("io", io)
 
 // Middleware
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+  origin: true,
+  credentials: true
+}))
 app.use(morgan("dev"))
 app.use(compression())
 app.use(express.json({ limit: "10mb" }))
