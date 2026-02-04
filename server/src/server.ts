@@ -23,7 +23,7 @@ const httpServer = createServer(app)
 // Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || true,
+    origin: "*",
     credentials: true,
   },
 })
@@ -41,7 +41,7 @@ app.set("io", io)
 app.use(helmet())
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: "*",
     credentials: true,
   }),
 )
