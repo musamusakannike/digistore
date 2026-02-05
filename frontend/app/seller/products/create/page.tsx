@@ -69,6 +69,7 @@ export default function CreateProductPage() {
 
             await apiFetchEnvelope("/products", {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
 
